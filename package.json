@@ -1,0 +1,22 @@
+{
+  "name": "oser",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Open Source Editorial Renderer.",
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "import:markdown": "npm run build --silent && node dist/packages/importers/src/cli/importMarkdown.js",
+    "import:txt": "npm run build --silent && node dist/packages/importers/src/cli/importTxt.js",
+    "render:html": "npm run build --silent && node dist/packages/html-renderer/src/cli/renderHtml.js",
+    "test": "npm run build --silent && node dist/packages/importers/src/cli/importTxt.js packages/importers/fixtures/simple.txt > /tmp/oser-import-test.json && node dist/packages/importers/src/cli/importMarkdown.js packages/importers/fixtures/simple.md > /tmp/oser-import-markdown-test.json && node dist/packages/html-renderer/src/cli/renderHtml.js examples/example.txt /tmp/oser-render-test.html > /tmp/oser-render-test.out && node dist/packages/html-renderer/src/cli/renderHtml.js examples/example.md /tmp/oser-render-markdown-test.html > /tmp/oser-render-markdown-test.out"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^20.17.0",
+    "typescript": "^5.6.0"
+  },
+  "dependencies": {
+    "markdown-it": "^14.1.1"
+  }
+}
