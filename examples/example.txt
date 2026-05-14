@@ -1,0 +1,9 @@
+# Example Document
+
+This is the first paragraph imported into the OSER document model.
+
+## A Simple Section
+
+This paragraph has no inline formatting yet. TXT import keeps the source simple.
+
+Another paragraph follows after a blank line.

@@ -1,0 +1,12 @@
+# Imported Fixture
+
+This is a simple TXT fixture.
+
+## Second Section
+
+Blank lines separate paragraphs.
+This line stays in the same paragraph for now.
+
+### Details
+
+Final paragraph.
