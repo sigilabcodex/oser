@@ -116,6 +116,67 @@ blockquote {
   padding-left: 1rem;
 }
 
+img {
+  height: auto;
+  max-width: 100%;
+}
+
+figure {
+  margin: 2rem 0;
+}
+
+figure img {
+  display: block;
+}
+
+p img {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+figcaption {
+  color: var(--oser-muted);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  margin-top: 0.6rem;
+}
+
+table {
+  border-collapse: collapse;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.92rem;
+  margin: 1.5rem 0;
+  width: 100%;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--oser-border);
+  padding: 0.55rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  font-weight: 700;
+}
+
+th[data-align="center"],
+td[data-align="center"] {
+  text-align: center;
+}
+
+th[data-align="right"],
+td[data-align="right"] {
+  text-align: right;
+}
+
+th > :last-child,
+td > :last-child {
+  margin-bottom: 0;
+}
+
 blockquote > :last-child,
 li > :last-child {
   margin-bottom: 0;

@@ -3,6 +3,7 @@ import type {
   BlockquoteNode,
   CodeBlockNode,
   EmphasisNode,
+  FigureNode,
   HeadingNode,
   HorizontalRuleNode,
   ImageNode,
@@ -14,7 +15,10 @@ import type {
   OserDocument,
   ParagraphNode,
   SectionNode,
-  StrongNode
+  StrongNode,
+  TableCellNode,
+  TableNode,
+  TableRowNode
 } from "../../document-model/src";
 
 export type RenderHtmlOptions = {
@@ -75,8 +79,9 @@ function renderBlock(node: BlockNode, depth: number): string {
     case "codeBlock":
       return renderCodeBlock(node, depth);
     case "table":
+      return renderTable(node, depth);
     case "figure":
-      return `${indent(depth)}<!-- Unsupported OSER block: ${node.type} -->`;
+      return renderFigure(node, depth);
   }
 }
 
@@ -139,6 +144,76 @@ function renderListItem(node: ListItemNode, depth: number): string {
 function renderCodeBlock(node: CodeBlockNode, depth: number): string {
   const language = node.language ? ` class="language-${escapeAttribute(node.language)}"` : "";
   return `${indent(depth)}<pre><code${language}>${escapeText(node.value)}</code></pre>`;
+}
+
+function renderTable(node: TableNode, depth: number): string {
+  const firstBodyRowIndex = node.rows.findIndex((row) => !isHeaderRow(row));
+  const headerRows = firstBodyRowIndex === -1 ? node.rows : node.rows.slice(0, firstBodyRowIndex);
+  const bodyRows = firstBodyRowIndex === -1 ? [] : node.rows.slice(firstBodyRowIndex);
+  const lines = [`${indent(depth)}<table>`];
+
+  if (headerRows.length > 0) {
+    lines.push(`${indent(depth + 1)}<thead>`);
+    lines.push(headerRows.map((row) => renderTableRow(row, depth + 2)).join("\n"));
+    lines.push(`${indent(depth + 1)}</thead>`);
+  }
+
+  if (bodyRows.length > 0) {
+    lines.push(`${indent(depth + 1)}<tbody>`);
+    lines.push(bodyRows.map((row) => renderTableRow(row, depth + 2)).join("\n"));
+    lines.push(`${indent(depth + 1)}</tbody>`);
+  }
+
+  lines.push(`${indent(depth)}</table>`);
+  return lines.join("\n");
+}
+
+function isHeaderRow(row: TableRowNode): boolean {
+  return row.cells.length > 0 && row.cells.every((cell) => cell.header);
+}
+
+function renderTableRow(node: TableRowNode, depth: number): string {
+  if (node.cells.length === 0) {
+    return `${indent(depth)}<tr></tr>`;
+  }
+
+  return [
+    `${indent(depth)}<tr>`,
+    node.cells.map((cell) => renderTableCell(cell, depth + 1)).join("\n"),
+    `${indent(depth)}</tr>`
+  ].join("\n");
+}
+
+function renderTableCell(node: TableCellNode, depth: number): string {
+  const tagName = node.header ? "th" : "td";
+  const align = node.align ? ` data-align="${escapeAttribute(node.align)}"` : "";
+  const inner = renderBlocks(node.children, depth + 1);
+
+  if (inner.length === 0) {
+    return `${indent(depth)}<${tagName}${align}></${tagName}>`;
+  }
+
+  return [`${indent(depth)}<${tagName}${align}>`, inner, `${indent(depth)}</${tagName}>`].join("\n");
+}
+
+function renderFigure(node: FigureNode, depth: number): string {
+  const children = node.children.map((child) => {
+    if (child.type === "image") {
+      return `${indent(depth + 1)}${renderImage(child)}`;
+    }
+
+    return renderParagraph(child, depth + 1);
+  });
+
+  if (node.caption) {
+    children.push(`${indent(depth + 1)}<figcaption>${renderInlines(node.caption.children)}</figcaption>`);
+  }
+
+  if (children.length === 0) {
+    return `${indent(depth)}<figure></figure>`;
+  }
+
+  return [`${indent(depth)}<figure>`, children.join("\n"), `${indent(depth)}</figure>`].join("\n");
 }
 
 function renderInlines(nodes: InlineNode[]): string {

@@ -12,6 +12,13 @@ This Markdown document imports into the OSER document model with *emphasis*, **s
 
 > A blockquote remains semantic.
 
+![OSER placeholder](assets/placeholder.svg "Placeholder image")
+
+| Element | Support |
+| --- | --- |
+| Images | Initial |
+| Tables | Initial |
+
 ```ts
 export const answer = 42;
 ```

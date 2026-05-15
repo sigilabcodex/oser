@@ -134,6 +134,7 @@ export type TableCellNode = {
   type: "tableCell";
   children: BlockNode[];
   header?: boolean;
+  align?: "left" | "center" | "right";
 };
 
 export type FigureNode = {

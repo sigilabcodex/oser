@@ -4,13 +4,17 @@ import MarkdownIt from "markdown-it";
 import type Token from "markdown-it/lib/token.mjs";
 import type {
   BlockNode,
+  FigureNode,
   HeadingNode,
   InlineNode,
   ListItemNode,
   ListNode,
   OserDocument,
   ParagraphNode,
-  SourceMapEntry
+  SourceMapEntry,
+  TableCellNode,
+  TableNode,
+  TableRowNode
 } from "../../../document-model/src";
 import type { ImportOptions, ImportResult, ImportWarning } from "../core/types";
 
@@ -130,10 +134,8 @@ function parseBlocks(
 
       case "paragraph_open": {
         const inline = tokens[index + 1];
-        const node: ParagraphNode = {
-          type: "paragraph",
-          children: inline?.type === "inline" ? parseInlineChildren(inline.children ?? [], context) : []
-        };
+        const children = inline?.type === "inline" ? parseInlineChildren(inline.children ?? [], context) : [];
+        const node = paragraphOrFigure(children);
         blocks.push(node);
         addSourceMap(context, currentPath, token);
         index += 3;
@@ -178,6 +180,14 @@ function parseBlocks(
         index += 1;
         break;
 
+      case "table_open": {
+        const closeIndex = findMatchingClose(tokens, index, "table_open", "table_close");
+        blocks.push(parseTable(tokens, index, closeIndex, context));
+        addSourceMap(context, currentPath, token);
+        index = closeIndex + 1;
+        break;
+      }
+
       case "html_block":
         context.warnings.push({
           code: "markdown-html-block-ignored",
@@ -196,6 +206,20 @@ function parseBlocks(
   }
 
   return blocks;
+}
+
+function paragraphOrFigure(children: InlineNode[]): ParagraphNode | FigureNode {
+  if (children.length === 1 && children[0].type === "image") {
+    return {
+      type: "figure",
+      children: [children[0]]
+    };
+  }
+
+  return {
+    type: "paragraph",
+    children
+  };
 }
 
 function parseList(
@@ -231,6 +255,78 @@ function parseList(
     ordered: openToken.type === "ordered_list_open",
     start: parseStart(openToken),
     children
+  };
+}
+
+function parseTable(tokens: Token[], openIndex: number, closeIndex: number, context: ParseContext): TableNode {
+  const rows: TableRowNode[] = [];
+  let index = openIndex + 1;
+  let expectedCellCount: number | undefined;
+
+  while (index < closeIndex) {
+    const token = tokens[index];
+
+    if (token.type !== "tr_open") {
+      index += 1;
+      continue;
+    }
+
+    const rowCloseIndex = findMatchingClose(tokens, index, "tr_open", "tr_close");
+    const row = parseTableRow(tokens, index, rowCloseIndex, context);
+    if (expectedCellCount === undefined) {
+      expectedCellCount = row.cells.length;
+    } else if (row.cells.length !== expectedCellCount) {
+      context.warnings.push({
+        code: "markdown-table-irregular-row",
+        severity: "warning",
+        message: "A Markdown table row has a different number of cells than the first row.",
+        location: lineLocation(token),
+        recoverable: true
+      });
+    }
+    rows.push(row);
+    index = rowCloseIndex + 1;
+  }
+
+  return {
+    type: "table",
+    rows
+  };
+}
+
+function parseTableRow(tokens: Token[], openIndex: number, closeIndex: number, context: ParseContext): TableRowNode {
+  const cells: TableCellNode[] = [];
+  let index = openIndex + 1;
+
+  while (index < closeIndex) {
+    const token = tokens[index];
+
+    if (token.type !== "th_open" && token.type !== "td_open") {
+      index += 1;
+      continue;
+    }
+
+    const closeType = token.type === "th_open" ? "th_close" : "td_close";
+    const cellCloseIndex = findMatchingClose(tokens, index, token.type, closeType);
+    const inline = tokens[index + 1];
+    const cellChildren = inline?.type === "inline" ? parseInlineChildren(inline.children ?? [], context) : [];
+    cells.push({
+      type: "tableCell",
+      header: token.type === "th_open" || undefined,
+      align: parseCellAlign(token),
+      children: [
+        {
+          type: "paragraph",
+          children: cellChildren
+        }
+      ]
+    });
+    index = cellCloseIndex + 1;
+  }
+
+  return {
+    type: "tableRow",
+    cells
   };
 }
 
@@ -300,6 +396,38 @@ function parseInlineChildren(tokens: Token[], context: ParseContext): InlineNode
         break;
       }
 
+      case "image": {
+        const src = token.attrGet("src") ?? "";
+        const alt = token.content;
+
+        if (alt.trim().length === 0) {
+          context.warnings.push({
+            code: "markdown-image-missing-alt",
+            severity: "warning",
+            message: "A Markdown image is missing alt text.",
+            recoverable: true
+          });
+        }
+
+        if (src.trim().length === 0) {
+          context.warnings.push({
+            code: "markdown-image-empty-src",
+            severity: "warning",
+            message: "A Markdown image has an empty image source.",
+            recoverable: true
+          });
+        }
+
+        nodes.push({
+          type: "image",
+          src,
+          alt,
+          title: token.attrGet("title") ?? undefined
+        });
+        index += 1;
+        break;
+      }
+
       case "html_inline":
         context.warnings.push({
           code: "markdown-html-inline-ignored",
@@ -317,6 +445,23 @@ function parseInlineChildren(tokens: Token[], context: ParseContext): InlineNode
   }
 
   return nodes;
+}
+
+function parseCellAlign(token: Token): "left" | "center" | "right" | undefined {
+  const style = token.attrGet("style");
+  if (style === "text-align:left") {
+    return "left";
+  }
+
+  if (style === "text-align:center") {
+    return "center";
+  }
+
+  if (style === "text-align:right") {
+    return "right";
+  }
+
+  return undefined;
 }
 
 function findMatchingClose(tokens: Token[], openIndex: number, openType: string, closeType: string): number {
