@@ -21,6 +21,7 @@ Render a source file to semantic HTML:
 npm run render:html -- examples/example.md examples/example.html
 npm run render:html -- examples/example.md examples/plain.html --style none
 npm run render:html -- examples/example.md examples/custom.html --style path/to/custom.css
+npm run render:html -- examples/example.md examples/example-print.html --style packages/html-renderer/styles/print.css
 ```
 
 The CLI currently supports `.txt`, `.md`, and `.markdown` inputs through the importers package.
@@ -33,4 +34,8 @@ packages/html-renderer/styles/editorial.css
 
 Use `--style none` to emit semantic HTML without a stylesheet link. Use `--style <path.css>` to link a project stylesheet instead. Relative CSS paths are converted to an href relative to the output HTML file.
 
-The stylesheet is intentionally modest: readable typography, sensible measure, vertical rhythm, basic code/list/blockquote rules, and print-friendly defaults.
+## Stylesheets
+
+`editorial.css` is the default browser reading stylesheet. It provides readable typography, a comfortable measure, vertical rhythm, and modest styles for editorial elements.
+
+`print.css` is an experimental print stylesheet for future PDF/pagination workflows. It uses standard CSS print features such as `@page`, letter-sized pages, print margins, `break-*`, `widows`, and `orphans`. It does not add folios, running headers, Paged.js features, browser automation, or PDF generation.
