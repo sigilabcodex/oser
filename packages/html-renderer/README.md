@@ -19,14 +19,18 @@ Render a source file to semantic HTML:
 
 ```bash
 npm run render:html -- examples/example.md examples/example.html
+npm run render:html -- examples/example.md examples/plain.html --style none
+npm run render:html -- examples/example.md examples/custom.html --style path/to/custom.css
 ```
 
 The CLI currently supports `.txt`, `.md`, and `.markdown` inputs through the importers package.
 
-Generated HTML links to:
+By default, generated HTML links to:
 
 ```text
 packages/html-renderer/styles/editorial.css
 ```
+
+Use `--style none` to emit semantic HTML without a stylesheet link. Use `--style <path.css>` to link a project stylesheet instead. Relative CSS paths are converted to an href relative to the output HTML file.
 
 The stylesheet is intentionally modest: readable typography, sensible measure, vertical rhythm, basic code/list/blockquote rules, and print-friendly defaults.
