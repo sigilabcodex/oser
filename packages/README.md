@@ -1,8 +1,6 @@
 # Packages
 
-This directory is reserved for future OSER packages.
-
-No packages or runtime dependencies are added in the seed phase.
+This directory contains the initial OSER package boundaries.
 
 Possible future package boundaries:
 

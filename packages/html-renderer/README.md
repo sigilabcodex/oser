@@ -41,3 +41,9 @@ Use `--style none` to emit semantic HTML without a stylesheet link. Use `--style
 `editorial.css` is the default browser reading stylesheet. It provides readable typography, a comfortable measure, vertical rhythm, and modest styles for editorial elements.
 
 `print.css` is an experimental print stylesheet for future PDF/pagination workflows. It uses standard CSS print features such as `@page`, letter-sized pages, print margins, `break-*`, `widows`, and `orphans`. It does not add folios, running headers, Paged.js features, browser automation, or PDF generation.
+
+For the experimental Playwright-based PDF adapter, see:
+
+```bash
+npm run render:pdf -- examples/example.md dist/examples/example.pdf
+```
