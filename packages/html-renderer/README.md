@@ -18,13 +18,15 @@ Current scope:
 Render a source file to semantic HTML:
 
 ```bash
-npm run render:html -- examples/example.md examples/example.html
-npm run render:html -- examples/example.md examples/plain.html --style none
-npm run render:html -- examples/example.md examples/custom.html --style path/to/custom.css
-npm run render:html -- examples/example.md examples/example-print.html --style packages/html-renderer/styles/print.css
+npm run render:html -- examples/example.md dist/examples/example.html
+npm run render:html -- examples/example.md dist/examples/plain.html --style none
+npm run render:html -- examples/example.md dist/examples/custom.html --style path/to/custom.css
+npm run render:html -- examples/example.md dist/examples/example-print.html --style packages/html-renderer/styles/print.css
 ```
 
 The CLI currently supports `.txt`, `.md`, and `.markdown` inputs through the importers package.
+
+Example sources live in `examples/`. Generated example outputs should go to `dist/examples/` because they are reproducible build artifacts and `dist/` is ignored by git.
 
 By default, generated HTML links to:
 

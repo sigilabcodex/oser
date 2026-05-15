@@ -1,4 +1,4 @@
-import { writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { basename, dirname, extname, isAbsolute, join, relative, resolve } from "node:path";
 import { importMarkdownFile, importTxtFile } from "../../../importers/src";
 import { renderDocumentToHtml } from "../renderDocumentToHtml";
@@ -17,6 +17,7 @@ async function main(): Promise<void> {
   const stylesheetHref = stylesheetHrefForOutput(outputPath, args.style);
   const html = renderDocumentToHtml(result.document, { stylesheetHref });
 
+  await mkdir(dirname(outputPath), { recursive: true });
   await writeFile(outputPath, `${html}\n`, "utf8");
   process.stdout.write(`${outputPath}\n`);
 }
