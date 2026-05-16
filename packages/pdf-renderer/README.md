@@ -18,6 +18,8 @@ It does not add Paged.js, folios, running headers, GUI behavior, or document-mod
 
 ```bash
 npm run render:pdf -- examples/example.md dist/examples/example.pdf
+npm run render:pdf -- examples/editorial-sample.md dist/examples/editorial-sample.pdf --format Letter
+npm run render:pdf -- examples/editorial-sample.md dist/examples/editorial-sample.pdf --html-output dist/examples/editorial-sample-print.html
 ```
 
 The default stylesheet is:
@@ -30,6 +32,12 @@ Generated temporary HTML is written under:
 
 ```text
 dist/.tmp/pdf-renderer/
+```
+
+Use a custom print stylesheet with:
+
+```bash
+npm run render:pdf -- examples/example.md dist/examples/example.pdf --style packages/html-renderer/styles/print.css
 ```
 
 If Chromium is not installed for Playwright, run:

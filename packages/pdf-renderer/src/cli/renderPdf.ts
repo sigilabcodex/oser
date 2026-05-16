@@ -1,81 +1,82 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { basename, dirname, extname, join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
-import { chromium } from "playwright";
-import { importMarkdownFile, importTxtFile } from "../../../importers/src";
-import { renderDocumentToHtml } from "../../../html-renderer/src";
+import { renderPdfFromFile, type PdfPageFormat } from "../renderPdfFromFile";
 
 async function main(): Promise<void> {
-  const [, , inputPath, outputPathArg] = process.argv;
+  const args = parseArgs(process.argv.slice(2));
 
-  if (!inputPath) {
-    console.error("Usage: npm run render:pdf -- <input.txt|input.md> [output.pdf]");
+  if (!args.inputPath) {
+    console.error("Usage: npm run render:pdf -- <input.txt|input.md> [output.pdf] [--style path/to/file.css] [--format Letter|A4] [--html-output path/to/file.html]");
     process.exitCode = 1;
     return;
   }
 
-  const outputPath = outputPathArg ?? defaultOutputPath(inputPath);
-  const result = await importByExtension(inputPath);
-  const htmlPath = temporaryHtmlPath(inputPath);
-  const html = withBaseHref(
-    renderDocumentToHtml(result.document, {
-      stylesheetHref: pathToFileURL(resolve("packages/html-renderer/styles/print.css")).href
-    }),
-    dirname(resolve(inputPath))
-  );
+  const result = await renderPdfFromFile({
+    inputPath: args.inputPath,
+    outputPath: args.outputPath,
+    stylePath: args.stylePath,
+    format: args.format,
+    htmlOutputPath: args.htmlOutputPath
+  });
 
-  await mkdir(dirname(htmlPath), { recursive: true });
-  await mkdir(dirname(outputPath), { recursive: true });
-  await writeFile(htmlPath, `${html}\n`, "utf8");
+  process.stdout.write(`${result.outputPath}\n`);
+}
 
-  const browser = await chromium.launch();
-  try {
-    const page = await browser.newPage();
-    await page.goto(pathToFileURL(resolve(htmlPath)).href, {
-      waitUntil: "networkidle"
-    });
-    await page.emulateMedia({ media: "print" });
-    await page.pdf({
-      path: outputPath,
-      format: "Letter",
-      printBackground: true,
-      preferCSSPageSize: true
-    });
-  } finally {
-    await browser.close();
+type CliArgs = {
+  inputPath?: string;
+  outputPath?: string;
+  stylePath?: string;
+  format?: PdfPageFormat;
+  htmlOutputPath?: string;
+};
+
+function parseArgs(args: string[]): CliArgs {
+  const positional: string[] = [];
+  const parsed: CliArgs = {};
+
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+
+    if (arg === "--style") {
+      parsed.stylePath = readOptionValue(args, index, "--style");
+      index += 1;
+      continue;
+    }
+
+    if (arg === "--format") {
+      parsed.format = parseFormat(readOptionValue(args, index, "--format"));
+      index += 1;
+      continue;
+    }
+
+    if (arg === "--html-output") {
+      parsed.htmlOutputPath = readOptionValue(args, index, "--html-output");
+      index += 1;
+      continue;
+    }
+
+    positional.push(arg);
   }
 
-  process.stdout.write(`${outputPath}\n`);
+  return {
+    ...parsed,
+    inputPath: positional[0],
+    outputPath: positional[1]
+  };
 }
 
-function defaultOutputPath(inputPath: string): string {
-  const extension = extname(inputPath);
-  const name = extension ? basename(inputPath, extension) : basename(inputPath);
-  return join("dist", "examples", `${name}.pdf`);
+function readOptionValue(args: string[], index: number, optionName: string): string {
+  const value = args[index + 1];
+  if (!value || value.startsWith("--")) {
+    throw new Error(`Missing value for ${optionName}.`);
+  }
+  return value;
 }
 
-function temporaryHtmlPath(inputPath: string): string {
-  const extension = extname(inputPath);
-  const name = extension ? basename(inputPath, extension) : basename(inputPath);
-  return join("dist", ".tmp", "pdf-renderer", `${name}.html`);
-}
-
-function withBaseHref(html: string, sourceDir: string): string {
-  const baseHref = pathToFileURL(`${sourceDir}/`).href;
-  return html.replace("    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">", [
-    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">",
-    `    <base href="${baseHref}">`
-  ].join("\n"));
-}
-
-async function importByExtension(inputPath: string) {
-  const extension = extname(inputPath).toLowerCase();
-
-  if (extension === ".md" || extension === ".markdown") {
-    return importMarkdownFile(inputPath);
+function parseFormat(value: string): PdfPageFormat {
+  if (value === "Letter" || value === "A4") {
+    return value;
   }
 
-  return importTxtFile(inputPath);
+  throw new Error("Invalid value for --format. Use Letter or A4.");
 }
 
 main().catch((error: unknown) => {
