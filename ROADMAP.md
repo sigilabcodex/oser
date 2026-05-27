@@ -1,89 +1,169 @@
 # OSER Roadmap
 
-This roadmap describes the intended sequence for the seed phase and early implementation work. It is not a release promise; it is a planning document for keeping scope clear.
+This roadmap describes the current implementation state and likely next steps. It is not a release promise. OSER is an experimental publishing and rendering engine, not a finished desktop publishing system.
 
-## 1. Semantic Markdown Renderer
+## Done
 
-Define the first supported Markdown profile and the editorial structures OSER expects to recognize.
+### Repository Foundation
 
-Expected work:
+- Initial project structure.
+- TypeScript build pipeline.
+- Basic documentation for architecture, principles, integration targets, packages, and examples.
+- Reproducible generated outputs under `dist/`.
 
-- choose the initial Markdown feature set
-- define conventions for headings, sections, notes, figures, captions, citations, and metadata
-- document unsupported syntax explicitly
-- produce an initial semantic HTML proof of concept later, after the seed phase
+### Document Model
 
-## 2. Document Model
+- `@oser/document-model` package.
+- `OserDocument` version `0.1`.
+- Metadata, block nodes, inline nodes, asset references, and source map hooks.
+- Current block support includes headings, paragraphs, blockquotes, lists, code blocks, tables, figures, images, horizontal rules, and sections.
 
-Introduce an internal document model that can represent editorial structure independently from any single output format.
+### TXT And Markdown Importers
 
-Expected work:
+- `@oser/importers` package.
+- TXT importer for paragraphs and Markdown-style headings.
+- Markdown importer built on `markdown-it`.
+- Markdown support for headings, paragraphs, emphasis, strong, inline code, links, blockquotes, ordered and unordered lists, code blocks, horizontal rules, tables, and images.
+- Import warnings for empty documents, BOM removal, ignored raw HTML, missing image alt text, empty image sources, missing link hrefs, and irregular table rows.
 
-- define document, section, block, inline, asset, and metadata concepts
-- make the model serializable enough for tests and integrations
-- keep rendering decisions separate from parsing concerns
+### Semantic HTML Renderer
 
-## 3. Editorial HTML
+- `@oser/html-renderer` package.
+- Full HTML document output.
+- Semantic rendering for the current document model nodes.
+- HTML escaping for text and attributes.
+- Deterministic indentation.
+- Optional stylesheet linking.
 
-Render the document model into semantic HTML that is usable for web, print, and ebook pipelines.
+### Editorial And Print CSS
 
-Expected work:
+- `packages/html-renderer/styles/editorial.css` for browser reading.
+- `packages/html-renderer/styles/print.css` for experimental print/PDF workflows.
+- Basic typography, spacing, table, figure, blockquote, code, and print behavior.
 
-- define stable HTML conventions
-- prefer meaningful elements and attributes over presentation-specific markup
-- keep generated HTML inspectable and portable
+### Experimental PDF Export
 
-## 4. Print CSS Presets
+- `@oser/pdf-renderer` package.
+- CLI and reusable render API.
+- Playwright / Chromium based PDF generation.
+- Default `print.css` stylesheet.
+- `Letter` and `A4` format option.
+- Optional HTML output path for inspecting the intermediate print HTML.
 
-Create CSS presets for editorial and print-oriented layouts.
+### Diagnostics
 
-Expected work:
+- `@oser/diagnostics` package.
+- CLI validation command.
+- Initial document checks for title, empty headings and paragraphs, heading level jumps, image metadata, empty tables, table row consistency, missing link hrefs, and empty code blocks.
 
-- define baseline typography, spacing, and page styles
-- support common article, essay, book, and report needs
-- keep presets overrideable by downstream projects
+### Commands And Examples
 
-## 5. Paged.js Preview
+- `npm run build`
+- `npm run import:markdown`
+- `npm run import:txt`
+- `npm run render:html`
+- `npm run render:pdf`
+- `npm run render:examples`
+- `npm run render:examples:pdf`
+- `npm run validate`
+- `npm run test`
+- Example source files in `examples/`.
+- Generated examples in `dist/examples/`.
 
-Add a paginated HTML preview workflow for print-oriented documents.
+## In Progress
 
-Expected work:
+### Stabilizing The Core Pipeline
 
-- provide preview templates for paged rendering
-- document browser-based preview expectations
-- separate preview support from final export logic
+- Clarify package boundaries.
+- Keep the document model independent from render and export concerns.
+- Keep generated artifacts reproducible.
+- Improve documentation so it matches the actual implementation.
 
-## 6. Playwright PDF Export
+### HTML And CSS Contracts
 
-Add a reproducible PDF export path using browser rendering.
+- Continue making semantic HTML conventions stable and inspectable.
+- Keep default CSS useful but overrideable by downstream projects.
+- Treat print CSS as a foundation for later paged-media work, not as a complete book layout system.
 
-Expected work:
+### Diagnostics
 
-- define export input and output contracts
-- support deterministic export settings where possible
-- keep generated PDFs as derived artifacts
+- Expand diagnostics carefully without turning them into project-specific editorial policy.
+- Keep diagnostics reusable from CLI, future GUI surfaces, integrations, and CI.
 
-## 7. EPUB Export
+## Next
 
-Add EPUB generation from the same document model and semantic HTML layer.
+### GUI Preview Surface
 
-Expected work:
+- Add a lightweight inspection GUI or app surface around the existing pipeline.
+- Initial GUI should likely load source files, show diagnostics, preview generated HTML, and trigger export commands.
+- It should call OSER packages rather than duplicating rendering logic.
+- It should not begin as a WYSIWYG editor.
 
-- define EPUB packaging requirements
-- map metadata and assets into the EPUB structure
-- validate generated EPUB output with standard tools when appropriate
+### TRURL Integration
 
-## 8. Integrations: TRURL / Astro / CLI
+- Define the integration contract between TRURL and OSER.
+- Support repository-backed editorial content, preview, diagnostics, and export workflows.
+- Keep TRURL product behavior separate from OSER rendering behavior.
 
-Expose OSER through integration points that can be used by downstream projects.
+### DOCX Import Workflow
 
-Expected work:
+- Design a DOCX-to-`OserDocument` mapping before implementation.
+- Start with headings, paragraphs, emphasis, strong, links, lists, tables, and images.
+- Define asset extraction and warning behavior.
+- Preserve conversion uncertainty through diagnostics or import warnings.
 
-- TRURL integration for editorial rendering workflows
-- Astro integration for web publishing
-- CLI entry points for local rendering and automation
-- clear boundaries between OSER core and project-specific UI
+### Paged.js Preview
 
-## Current Phase
+- Add a browser-based paginated preview path.
+- Keep Paged.js preview separate from the basic HTML renderer and the current PDF adapter.
+- Define explicit conventions for page breaks, running elements, and print-only layout features.
 
-Seed repository: documentation, principles, architecture notes, and minimal directory structure. No renderer implementation or runtime dependencies are part of this phase.
+### Advanced PDF Work
+
+- Build on semantic HTML, print CSS, and eventual Paged.js support.
+- Add support for folios, running headers, front matter, generated contents, and more deterministic page behavior.
+- Add visual or artifact-level regression fixtures before expanding PDF behavior too far.
+
+## Future
+
+### EPUB Export
+
+- Generate EPUB from the same document model and semantic HTML layer.
+- Define packaging, metadata, asset, and validation requirements.
+
+### Astro And Web Publishing Integrations
+
+- Provide integration points for static site workflows.
+- Keep web publishing adapters separate from OSER core.
+
+### Richer Asset Pipeline
+
+- Track imported assets.
+- Copy, resolve, and optionally fingerprint images or linked files.
+- Keep asset manifests inspectable.
+
+### Advanced Editorial Structures
+
+- Notes.
+- Citations.
+- References.
+- Captions beyond the current minimal figure support.
+- Cross references.
+- Tables of contents.
+- Front matter and back matter.
+
+### Package Publishing
+
+- Decide whether and how packages should be published.
+- Formalize public APIs before publishing.
+
+## Not Currently Implemented
+
+- GUI.
+- DOCX importer.
+- EPUB export.
+- Paged.js preview.
+- Advanced PDF layout.
+- InDesign-style visual editing.
+- Full editorial linting.
+- Full asset pipeline.

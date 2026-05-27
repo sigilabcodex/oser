@@ -1,50 +1,120 @@
 # Architecture
 
-OSER is planned as a rendering pipeline that keeps source text, document structure, presentation, and exports separate.
+OSER is a rendering pipeline that keeps source text, document structure, presentation, diagnostics, and export adapters separate.
 
-## Conceptual Pipeline
+The current implementation is an early functional prototype. It can import TXT and Markdown, build an `OserDocument`, render semantic HTML, apply editorial or print CSS, run diagnostics, and produce experimental PDFs through Playwright and Chromium.
+
+## Current Pipeline
 
 ```text
-Markdown / structured text
-  -> parser
-  -> document model
-  -> semantic HTML
-  -> editorial CSS
-  -> paged HTML / EPUB / PDF / Web
+TXT / Markdown
+  -> @oser/importers
+  -> @oser/document-model
+  -> @oser/diagnostics
+  -> @oser/html-renderer
+  -> editorial.css / print.css
+  -> @oser/pdf-renderer
+  -> Playwright / Chromium PDF
 ```
 
-Each stage should have a clear contract. The parser should not need to know about PDF export details, and UI integrations should not need to duplicate rendering logic.
+Diagnostics are optional and can run after import. PDF export currently composes the existing importer, document model, HTML renderer, print stylesheet, and browser automation layers.
 
-## Main Layers
+## Package Boundaries
 
-### Source Input
+### `@oser/document-model`
 
-The primary input is Markdown or Markdown-like structured text with explicit editorial conventions. Source files should remain readable, versionable, and reviewable in a normal repository workflow.
+Defines the shared TypeScript representation used between importers, renderers, diagnostics, and future integrations.
 
-### Document Model
+Current scope:
 
-The document model is the intermediate representation between source text and output formats. It should describe editorial meaning: document metadata, sections, headings, paragraphs, figures, captions, notes, references, and other structural elements.
+- document metadata
+- block nodes
+- inline nodes
+- minimal asset references
+- source map hooks
 
-The model should avoid encoding output-specific layout decisions too early.
+The document model should not encode browser, PDF, GUI, or paged-media implementation details.
 
-### Semantic HTML
+### `@oser/importers`
 
-HTML output should use meaningful elements and stable attributes. It should be suitable for web rendering, paged rendering, EPUB packaging, and downstream styling.
+Converts external source formats into `OserDocument` values.
 
-### Editorial CSS
+Current scope:
 
-CSS presets should handle typography, spacing, paged-media behavior, and common editorial patterns. Presets should be overrideable by projects that need their own visual system.
+- shared import contracts
+- TXT importer
+- Markdown importer
+- import warnings
+- import manifests
 
-### Export Adapters
+Current source formats are `.txt`, `.md`, and `.markdown`. DOCX, HTML, and RTF are possible future import targets but are not implemented yet.
 
-Export adapters should derive final artifacts from the semantic HTML and editorial CSS layers.
+### `@oser/html-renderer`
 
-Potential adapters include:
+Converts `OserDocument` values into semantic HTML.
 
-- paged HTML preview
-- PDF export through browser rendering
-- EPUB packaging
-- web output for static site workflows
+Current scope:
+
+- full HTML document output
+- semantic block and inline rendering
+- text and attribute escaping
+- deterministic formatting
+- optional stylesheet links
+
+The HTML renderer should not know about product UI, site deployment, or PDF automation.
+
+### CSS Presets
+
+Current CSS lives in `packages/html-renderer/styles/`.
+
+- `editorial.css`: default browser reading stylesheet.
+- `print.css`: experimental print-oriented stylesheet for PDF and future paged-media workflows.
+
+CSS presets should remain overrideable by downstream projects.
+
+### `@oser/pdf-renderer`
+
+Composes the import, HTML, CSS, and browser automation layers into PDF output.
+
+Current scope:
+
+- Playwright / Chromium PDF export
+- default print stylesheet
+- `Letter` and `A4` page format option
+- optional intermediate HTML output
+
+This package is experimental. It does not currently provide Paged.js, running headers, folios, advanced page furniture, generated contents, or book-grade layout control.
+
+### `@oser/diagnostics`
+
+Validates imported `OserDocument` values and returns structured diagnostics.
+
+Current scope:
+
+- missing document title
+- empty headings and paragraphs
+- suspicious heading jumps
+- image metadata checks
+- empty tables
+- inconsistent table rows
+- missing link hrefs
+- empty code blocks
+
+Diagnostics are intentionally separate from importers and renderers so the same report can be used by the CLI, future GUI surfaces, integrations, CI, or export workflows.
+
+## Data Flow
+
+Source files should remain readable and versionable. OSER derives generated artifacts from those files:
+
+```text
+source file
+  -> imported document
+  -> diagnostics report
+  -> HTML
+  -> optional PDF
+```
+
+Generated files under `dist/` are derived artifacts.
 
 ## Boundaries
 
@@ -54,6 +124,21 @@ OSER core should stay separate from:
 - project-specific CMS behavior
 - product UI
 - hosting and deployment
-- content authoring policy
+- editorial policy
+- site-specific styling requirements
 
-Downstream projects can provide those layers while reusing OSER for rendering.
+Downstream projects can provide those layers while reusing OSER for document import, rendering, diagnostics, and export.
+
+## Future Architecture Work
+
+Likely future layers include:
+
+- GUI preview and inspection surface
+- Paged.js preview adapter
+- DOCX importer
+- EPUB exporter
+- richer asset pipeline
+- web publishing adapters
+- TRURL-specific integration package or adapter
+
+These should build on the current contracts rather than bypassing them.

@@ -1,35 +1,61 @@
 # Principles
 
-OSER is early-stage software. These principles are meant to keep the project focused as implementation begins.
+OSER is early-stage software with a working rendering pipeline. These principles keep the project focused as it grows from prototype toward reusable publishing infrastructure.
 
-## Markdown First
+## Source First
 
-Markdown or structured plain text should be the primary authoring format. Documents should be readable without a specialized editor.
+Markdown, structured plain text, and future imported formats should remain inspectable and versionable. Source files are the canonical inputs. HTML, temporary files, PDFs, and other outputs are derived artifacts.
 
-## Repo First
+## Document Model First
 
-Publishing workflows should work naturally in a repository: versioned files, reviewable changes, reproducible builds, and derived outputs that can be regenerated.
+OSER should preserve editorial structure in a portable `OserDocument` before rendering to a specific output.
+
+The model should describe document meaning, not product UI, browser automation, or page geometry.
 
 ## Semantic HTML First
 
-OSER should prefer semantic HTML as the central output layer before generating PDF, EPUB, or web-specific artifacts.
+Semantic HTML is the central output layer before PDF, EPUB, paged preview, or web-specific integrations.
 
-## No WYSIWYG Initially
-
-The project should not begin by building a visual editor. Editing interfaces can exist later, but the first priority is a reliable renderer and document model.
-
-## Outputs Are Derived Artifacts
-
-PDF, EPUB, paginated HTML, and web output should be generated from source content and rendering rules. They should not become the canonical source of truth.
+HTML should be meaningful, inspectable, and stable enough for downstream tools to style or transform.
 
 ## Keep Rendering Separate From UI
 
-Rendering should live in reusable packages and APIs. User interfaces, site integrations, and product-specific workflows should call into the renderer rather than containing renderer logic directly.
+Rendering belongs in reusable packages and APIs. User interfaces, site integrations, product workflows, and deployment logic should call into OSER rather than embedding renderer logic.
 
-## Open Source / FLOSS Oriented
+## No WYSIWYG Initially
 
-OSER should be designed as open source infrastructure for publishing workflows. Dependencies, licenses, and architecture choices should be evaluated with that orientation in mind.
+OSER should not begin as a visual editor. A future GUI can help inspect, preview, validate, and export documents, but the first priority is a reliable import/render/export pipeline.
+
+## Honest Experimental Scope
+
+OSER is not an InDesign replacement. It is an experimental publishing and rendering engine.
+
+Advanced PDF layout, Paged.js preview, GUI workflows, EPUB export, DOCX import, and full asset management are future work unless explicitly implemented.
+
+## Outputs Are Reproducible Artifacts
+
+Generated outputs should be rebuildable from source content and renderer settings. This keeps repository workflows reviewable and reduces manual drift between source and output.
+
+## Diagnostics Are Shared Infrastructure
+
+Diagnostics should be reusable from the CLI, future GUI surfaces, CI, TRURL, and other integrations.
+
+They should report structural and rendering-relevant issues without becoming a project-specific editorial style guide by default.
 
 ## Progressive Enhancement
 
-The system should be useful at simple levels first: structured Markdown to semantic HTML, then richer styling, preview, export, and integrations. Advanced features should build on stable lower layers.
+OSER should remain useful at simple levels first:
+
+```text
+TXT / Markdown
+  -> OserDocument
+  -> semantic HTML
+  -> diagnostics
+  -> experimental PDF
+```
+
+Richer capabilities should build on stable lower layers rather than bypassing them.
+
+## FLOSS-Oriented
+
+OSER should be designed as open source infrastructure for publishing workflows. Dependencies, licenses, and architecture choices should be evaluated with that orientation in mind.

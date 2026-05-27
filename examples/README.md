@@ -2,22 +2,35 @@
 
 This directory contains small source documents and rendering fixtures.
 
-Generated outputs should be treated as derived artifacts unless a specific fixture is needed for tests. To regenerate the current HTML examples, run:
+Current source examples include TXT, Markdown, an editorial sample, and local image assets.
+
+Generated outputs are derived artifacts and should be written to `dist/examples/`, which is ignored by git.
+
+Generate the current HTML examples:
 
 ```bash
 npm run render:examples
 ```
 
-That writes generated HTML to:
+Generate the current PDF examples:
+
+```bash
+npm run render:examples:pdf
+```
+
+Generated files are written under:
 
 ```text
 dist/examples/
 ```
 
-Examples should stay focused and should demonstrate one concept at a time, such as:
+Example documents should stay focused and should demonstrate one concept at a time, such as:
 
 - basic article structure
+- Markdown tables
+- Markdown images
 - figures and captions
-- notes and references
-- print preview input
-- EPUB-oriented document metadata
+- print stylesheet input
+- diagnostics-friendly source structure
+
+EPUB-oriented metadata, DOCX imports, Paged.js previews, and GUI workflows are future concerns, not current example coverage.
