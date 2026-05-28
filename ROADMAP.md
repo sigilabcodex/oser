@@ -92,6 +92,25 @@ This roadmap describes the current implementation state and likely next steps. I
 
 ## Next
 
+### OSER Studio Design Line
+
+- Document a future Studio UX without implementing a GUI yet.
+- Define Studio as a visual control surface for OSER Core, not as a replacement for the core packages.
+- Keep the first Studio concept focused on structure inspection, diagnostics, paginated preview, checkpoints, variants, and export control.
+- Avoid promising freeform WYSIWYG, pixel-perfect page layout, or a total InDesign/Scribus replacement.
+- Treat TRURL as a possible first host or consumer while keeping Studio separable as a future app.
+
+Phased Studio direction:
+
+- Phase 0: UX documentation and conceptual architecture.
+- Phase 1: local HTML/PDF preview surface around existing OSER commands.
+- Phase 2: layout profile inspector and style preset selection.
+- Phase 3: diagnostics UI for import, structure, layout, and export readiness.
+- Phase 4: Git checkpoints and variants expressed in editorial language.
+- Phase 5: export panel for PDF, EPUB, HTML, and generated artifact metadata.
+- Phase 6: limited visual editing for supported declarative controls only.
+- Phase 7: AI-assisted layout exploration with transparent diagnostics and user approval.
+
 ### GUI Preview Surface
 
 - Add a lightweight inspection GUI or app surface around the existing pipeline.
