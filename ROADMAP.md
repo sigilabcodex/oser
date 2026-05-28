@@ -90,6 +90,12 @@ This roadmap describes the current implementation state and likely next steps. I
 - Expand diagnostics carefully without turning them into project-specific editorial policy.
 - Keep diagnostics reusable from CLI, future GUI surfaces, integrations, and CI.
 
+### Layout Profile
+
+- Introduce an experimental typed `LayoutProfile` layer for page settings, margins, typography, block styles, figures, tables, and print behavior.
+- Generate CSS from profile JSON without replacing current `editorial.css`, `print.css`, or renderer behavior.
+- Keep the first profile schema small enough for future Studio controls to edit safely.
+
 ## Next
 
 ### OSER Studio Design Line

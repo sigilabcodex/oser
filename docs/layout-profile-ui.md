@@ -4,6 +4,12 @@ Layout profiles are the primary bridge between OSER's declarative rendering engi
 
 A layout profile should describe how a document flows into a target medium without turning the GUI into a freeform page layout canvas.
 
+## Experimental Schema Layer
+
+OSER now has an initial `packages/layout-profile` package that defines a minimal typed `LayoutProfile` and a CSS generator. This is a bridge layer for future Studio controls, not a full layout engine.
+
+The initial schema covers page settings, margins, typography, headings, block defaults, figures, tables, and basic print behavior. It intentionally does not implement Paged.js, master pages, running headers, visual editing, or automatic integration with existing render commands. Generated CSS can be passed manually to renderers with `--style` while the profile contract stabilizes.
+
 ## Role In Studio
 
 In OSER Studio, layout profiles should answer:

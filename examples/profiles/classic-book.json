@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "oser.layout-profile/v0",
+  "id": "classic-book",
+  "name": "Classic Book",
+  "description": "A conservative print-first profile for long-form prose proofing.",
+  "page": {
+    "size": "Letter",
+    "orientation": "portrait"
+  },
+  "margins": {
+    "top": "0.85in",
+    "right": "0.8in",
+    "bottom": "0.9in",
+    "left": "0.8in"
+  },
+  "typography": {
+    "bodyFontFamily": "Georgia, \"Times New Roman\", serif",
+    "headingFontFamily": "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "baseFontSize": "11pt",
+    "lineHeight": 1.48,
+    "textColor": "#111111",
+    "mutedColor": "#555555",
+    "backgroundColor": "#ffffff",
+    "accentColor": "#111111",
+    "maxWidth": "38rem"
+  },
+  "headings": {
+    "fontWeight": 700,
+    "lineHeight": 1.16,
+    "marginBefore": "1.8em",
+    "marginAfter": "0.55em",
+    "h1Size": "22pt",
+    "h2Size": "16pt",
+    "h3Size": "13pt",
+    "h4Size": "11pt",
+    "breakAfterAvoid": true
+  },
+  "blocks": {
+    "paragraphSpacing": "0.95rem",
+    "listIndent": "1.35rem",
+    "listItemSpacing": "0.2rem",
+    "blockquoteBorder": "2pt solid #b8b8b8",
+    "blockquoteColor": "#555555",
+    "blockquotePaddingLeft": "0.75rem",
+    "blockquoteBreakInsideAvoid": true,
+    "sceneBreakSpacing": "1.35rem",
+    "sceneBreakWidth": "36%"
+  },
+  "figures": {
+    "margin": "1.6rem 0",
+    "imageMaxWidth": "100%",
+    "captionFontSize": "9pt",
+    "captionColor": "#555555",
+    "captionSpacing": "0.45rem",
+    "breakInsideAvoid": true
+  },
+  "tables": {
+    "fontSize": "9.5pt",
+    "borderColor": "#b8b8b8",
+    "cellPadding": "0.35rem 0.45rem",
+    "headerFontWeight": 700,
+    "fullWidth": true,
+    "breakInsideAvoid": true
+  },
+  "print": {
+    "enabled": true,
+    "breakHeadingsAfterAvoid": true,
+    "avoidBreakInsideBlocks": true,
+    "widows": 3,
+    "orphans": 3,
+    "printBackground": true
+  }
+}

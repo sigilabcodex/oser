@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "oser.layout-profile/v0",
+  "id": "report",
+  "name": "Report",
+  "description": "A readable report profile for structured documents, tables, and screen review.",
+  "page": {
+    "size": "A4",
+    "orientation": "portrait"
+  },
+  "margins": {
+    "top": "20mm",
+    "right": "18mm",
+    "bottom": "22mm",
+    "left": "18mm"
+  },
+  "typography": {
+    "bodyFontFamily": "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "headingFontFamily": "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+    "baseFontSize": "10.5pt",
+    "lineHeight": 1.55,
+    "textColor": "#1f2328",
+    "mutedColor": "#5d6673",
+    "backgroundColor": "#ffffff",
+    "accentColor": "#075b8d",
+    "maxWidth": "46rem"
+  },
+  "headings": {
+    "fontWeight": 750,
+    "lineHeight": 1.18,
+    "marginBefore": "1.6em",
+    "marginAfter": "0.5em",
+    "h1Size": "24pt",
+    "h2Size": "17pt",
+    "h3Size": "13pt",
+    "h4Size": "10.5pt",
+    "breakAfterAvoid": true
+  },
+  "blocks": {
+    "paragraphSpacing": "1rem",
+    "listIndent": "1.45rem",
+    "listItemSpacing": "0.28rem",
+    "blockquoteBorder": "0.22rem solid #d7dce2",
+    "blockquoteColor": "#5d6673",
+    "blockquotePaddingLeft": "1rem",
+    "blockquoteBreakInsideAvoid": true,
+    "sceneBreakSpacing": "1.5rem",
+    "sceneBreakWidth": "100%"
+  },
+  "figures": {
+    "margin": "1.75rem 0",
+    "imageMaxWidth": "100%",
+    "captionFontSize": "0.85rem",
+    "captionColor": "#5d6673",
+    "captionSpacing": "0.55rem",
+    "breakInsideAvoid": true
+  },
+  "tables": {
+    "fontSize": "0.9rem",
+    "borderColor": "#d7dce2",
+    "cellPadding": "0.5rem 0.65rem",
+    "headerFontWeight": 750,
+    "fullWidth": true,
+    "breakInsideAvoid": true
+  },
+  "print": {
+    "enabled": true,
+    "breakHeadingsAfterAvoid": true,
+    "avoidBreakInsideBlocks": true,
+    "widows": 3,
+    "orphans": 3,
+    "printBackground": true
+  }
+}

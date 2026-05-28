@@ -16,7 +16,7 @@ TXT / Markdown
   -> OserDocument
   -> diagnostics
   -> semantic HTML
-  -> editorial.css / print.css
+  -> editorial.css / print.css or generated LayoutProfile CSS
   -> experimental PDF through Playwright / Chromium
 ```
 
@@ -31,6 +31,7 @@ The current repository contains these package boundaries:
 - `@oser/html-renderer`: semantic HTML renderer with optional stylesheet linking.
 - `@oser/pdf-renderer`: experimental PDF export adapter using Playwright and Chromium.
 - `@oser/diagnostics`: initial validation and diagnostics for imported documents.
+- `@oser/layout-profile`: experimental typed layout profile objects and CSS generation for future Studio workflows.
 
 ## Supported Inputs
 
@@ -88,6 +89,14 @@ Run diagnostics:
 ```bash
 npm run validate -- examples/example.md
 ```
+
+Generate CSS from an experimental layout profile:
+
+```bash
+npm run profile:css -- examples/profiles/classic-book.json dist/examples/classic-book.css
+```
+
+The generated CSS can be passed manually to the existing HTML renderer with `--style`; it is not wired into render commands by default yet.
 
 Run the smoke test suite:
 

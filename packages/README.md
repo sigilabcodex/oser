@@ -30,6 +30,12 @@ Current styles:
 - `styles/editorial.css`
 - `styles/print.css`
 
+### `layout-profile`
+
+Experimental typed layout profile objects and CSS generation.
+
+It provides a first declarative layer for future Studio layout controls without replacing `editorial.css`, `print.css`, or the current renderers.
+
 ### `pdf-renderer`
 
 Experimental PDF export adapter.
