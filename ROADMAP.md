@@ -102,6 +102,7 @@ This roadmap describes the current implementation state and likely next steps. I
 
 - Document a future Studio UX without implementing a GUI yet.
 - Define Studio as a visual control surface for OSER Core, not as a replacement for the core packages.
+- Keep `studio-server` as an optional adapter contract between a future Studio UI and OSER Core.
 - Keep the first Studio concept focused on structure inspection, diagnostics, paginated preview, checkpoints, variants, and export control.
 - Avoid promising freeform WYSIWYG, pixel-perfect page layout, or a total InDesign/Scribus replacement.
 - Treat TRURL as a possible first host or consumer while keeping Studio separable as a future app.
@@ -109,13 +110,19 @@ This roadmap describes the current implementation state and likely next steps. I
 Phased Studio direction:
 
 - Phase 0: UX documentation and conceptual architecture.
-- Phase 1: local HTML/PDF preview surface around existing OSER commands.
-- Phase 2: layout profile inspector and style preset selection.
-- Phase 3: diagnostics UI for import, structure, layout, and export readiness.
-- Phase 4: Git checkpoints and variants expressed in editorial language.
-- Phase 5: export panel for PDF, EPUB, HTML, and generated artifact metadata.
-- Phase 6: limited visual editing for supported declarative controls only.
-- Phase 7: AI-assisted layout exploration with transparent diagnostics and user approval.
+- Phase 1: documented `studio-server` MVP contract around fixed fixtures and `dist/studio/` outputs.
+- Phase 2: optional local Node server with fixture-backed endpoints.
+- Phase 3: render HTML and validate endpoints using OSER Core and `RenderManifest`.
+- Phase 4: PDF export endpoint using the experimental PDF pipeline.
+- Phase 5: first optional React app consuming the server endpoints.
+- Phase 6: layout profile inspector and style preset selection.
+- Phase 7: diagnostics UI for import, structure, layout, and export readiness.
+- Phase 8: Git checkpoints and variants expressed in editorial language.
+- Phase 9: export panel for PDF, EPUB, HTML, and generated artifact metadata.
+- Phase 10: limited visual editing for supported declarative controls only.
+- Phase 11: AI-assisted layout exploration with transparent diagnostics and user approval.
+
+See `docs/studio-server-contract.md` for the current MVP server contract.
 
 ### WebBook Export Design Line
 

@@ -84,52 +84,40 @@ This model is appropriate only after OSER Core APIs are stable enough to publish
 
 ## Recommended MVP Shape
 
-For the first MVP, prefer a monorepo reference app because it reduces packaging friction while preserving boundaries.
+For the first MVP, prefer documenting and validating the optional `studio-server` adapter before creating a GUI app. The current server contract lives in `docs/studio-server-contract.md`.
 
-Proposed structure:
+A later monorepo reference app may still be useful because it reduces packaging friction while preserving boundaries.
+
+Proposed adapter structure:
 
 ```text
-apps/
-  studio/
-    src/
-      main.tsx
-      App.tsx
-      components/
-        AppShell.tsx
-        SourcePanel.tsx
-        PreviewPanel.tsx
-        ProfilePanel.tsx
-        DiagnosticsPanel.tsx
-        ExportPanel.tsx
-
 packages/
   studio-server/
     src/
       index.ts
       routes.ts
+      studioProject.ts
       oserPipeline.ts
+    README.md
 
 dist/
   studio/
     preview.html
-    preview-profile.css
+    preview.css
     export.pdf
+    manifest.json
     diagnostics.json
 ```
+
+A future app can be added later, after this adapter contract is stable.
 
 `packages/studio-server/` is not Core. It is a local adapter used by `apps/studio/` to call Core packages and write generated artifacts. If another project wants to call Core directly, it should not need this package.
 
 ## Proposed Stack
 
-Initial stack:
+The server MVP should avoid new frameworks unless they become necessary. A minimal Node HTTP server is enough for the first adapter spike.
 
-- Vite
-- React
-- TypeScript
-- local Node server
-- iframe preview
-
-The stack belongs to Studio only. Adding Vite or React for Studio must not make OSER Core a React or Vite framework. Core packages should remain usable from Node scripts, CLIs, tests, and downstream projects without Studio dependencies.
+A future Studio UI may use React, Vite, TypeScript, and an iframe preview, but those choices belong to Studio only. Adding UI tooling for Studio must not make OSER Core a React or Vite framework. Core packages should remain usable from Node scripts, CLIs, tests, and downstream projects without Studio dependencies.
 
 ## MVP Workflow
 
@@ -151,37 +139,21 @@ The MVP should not require arbitrary filesystem access. It should use fixtures a
 
 ## Minimal Backend Endpoints
 
-Possible local server endpoints:
+The MVP server contract defines these endpoints:
 
 ```text
 GET  /api/studio/document
 GET  /api/studio/profiles
-POST /api/studio/validate
 POST /api/studio/render-html
 POST /api/studio/export-pdf
-GET  /preview/preview.html
-GET  /outputs/export.pdf
+POST /api/studio/validate
+GET  /preview/:file
+GET  /outputs/:file
 ```
 
-The backend should call existing OSER APIs or CLI-equivalent functions. It should avoid duplicating importer, renderer, diagnostic, layout profile, or PDF behavior.
+The backend should call existing OSER APIs or CLI-equivalent functions. It should avoid duplicating importer, renderer, diagnostic, layout profile, render manifest, or PDF behavior. Responses should be derived from `RenderManifest` after successful render and export operations.
 
-Example payload shape:
-
-```ts
-type StudioRenderRequest = {
-  sourcePath: string;
-  profilePath?: string;
-};
-
-type StudioRenderResponse = {
-  previewUrl: string;
-  htmlPath: string;
-  generatedCssPath?: string;
-  diagnostics: unknown[];
-};
-```
-
-Exact types can be refined when implementation begins.
+Exact request and response types are defined in `docs/studio-server-contract.md`.
 
 ## Minimal Frontend Components
 
