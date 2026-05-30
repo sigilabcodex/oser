@@ -117,6 +117,25 @@ Phased Studio direction:
 - Phase 6: limited visual editing for supported declarative controls only.
 - Phase 7: AI-assisted layout exploration with transparent diagnostics and user approval.
 
+### WebBook Export Design Line
+
+- Document a future browser-based reading export without implementing it yet.
+- Define WebBook as a self-contained HTML file or portable static folder, not as an EPUB replacement.
+- Keep WebBook separate from the current semantic HTML renderer, PDF exporter, and future EPUB exporter.
+- Introduce `ReadingProfile` as a proposed reader-behavior contract distinct from `LayoutProfile`.
+- Treat bookmarks, annotations, search, local persistence, and offline behavior as incremental reader features.
+- Keep the first architecture compatible with static publishing, local archives, and microsite-style deployment.
+
+Phased WebBook direction:
+
+- Phase 1: static WebBook shell around semantic HTML.
+- Phase 2: navigable TOC and reader settings.
+- Phase 3: bookmarks and notes through localStorage.
+- Phase 4: client-side search.
+- Phase 5: optional offline/PWA support for compatible static-folder deployments.
+- Phase 6: export and import annotations.
+- Phase 7: Studio integration as a selectable export target.
+
 ### GUI Preview Surface
 
 - Add a lightweight inspection GUI or app surface around the existing pipeline.
