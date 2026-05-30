@@ -70,6 +70,7 @@ Render HTML:
 npm run render:html -- examples/example.md dist/examples/example.html
 npm run render:html -- examples/example.md dist/examples/plain.html --style none
 npm run render:html -- examples/example.md dist/examples/example-print.html --style packages/html-renderer/styles/print.css
+npm run render:html -- examples/editorial-sample.md dist/examples/editorial-sample-profile.html --profile examples/profiles/classic-book.json
 ```
 
 Generate the HTML examples:
@@ -96,7 +97,7 @@ Generate CSS from an experimental layout profile:
 npm run profile:css -- examples/profiles/classic-book.json dist/examples/classic-book.css
 ```
 
-The generated CSS can be passed manually to the existing HTML renderer with `--style`; it is not wired into render commands by default yet.
+The generated CSS is also used automatically when `render:html` or `render:pdf` receives `--profile`. Generated profile CSS is written under `dist/.tmp/layout-profiles/` unless a command asks for an explicit output path.
 
 Run the smoke test suite:
 
@@ -114,6 +115,7 @@ OSER has an experimental PDF adapter:
 npm run render:pdf -- examples/example.md dist/examples/example.pdf
 npm run render:pdf -- examples/editorial-sample.md dist/examples/editorial-sample.pdf --format Letter
 npm run render:pdf -- examples/editorial-sample.md dist/examples/editorial-sample.pdf --html-output dist/examples/editorial-sample-print.html
+npm run render:pdf -- examples/editorial-sample.md dist/examples/editorial-sample-profile.pdf --profile examples/profiles/classic-book.json
 ```
 
 The PDF pipeline currently uses:
@@ -123,6 +125,7 @@ Markdown / TXT
   -> OserDocument
   -> semantic HTML
   -> packages/html-renderer/styles/print.css
+  -> optional generated LayoutProfile CSS
   -> Playwright / Chromium PDF
 ```
 

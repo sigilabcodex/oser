@@ -1,8 +1,10 @@
 # OSER Studio UX
 
-OSER Studio is a proposed visual control surface for OSER's declarative editorial engine.
+OSER Studio is a proposed optional visual control surface for OSER's declarative editorial engine.
 
-It is not the first implementation target for OSER Core, and it should not begin as a freeform WYSIWYG layout tool. The first useful version should help editors and designers inspect structure, choose layout rules, preview paginated output, review diagnostics, create editorial checkpoints, and export reproducible artifacts.
+It is not OSER Core, not a required dependency, and not the first implementation target for the core rendering pipeline. It should not begin as a freeform WYSIWYG layout tool. The first useful version should help editors and designers inspect structure, choose layout rules, preview generated output, review diagnostics, and export reproducible artifacts.
+
+For the Core/Studio boundary and MVP architecture, see [OSER Studio Architecture](studio-architecture.md).
 
 ## Vision
 
@@ -21,12 +23,13 @@ The interface should expose editorial decisions without hiding the source-first 
 
 The initial Studio experience should prioritize:
 
-- previewing rendered HTML and PDF output
-- inspecting document structure
-- selecting and tuning declarative layout profiles
+- previewing rendered HTML output in an iframe
+- selecting a known source fixture for the MVP
+- selecting a declarative `LayoutProfile`
 - reviewing diagnostics before export
-- creating checkpoints for reviewable editorial states
-- exporting PDF, EPUB, and HTML when those targets exist
+- rendering HTML into `dist/studio/`
+- exporting PDF into `dist/studio/`
+- inspecting document structure when that view exists
 
 It should not promise to replace InDesign, Scribus, or other page layout tools. OSER Studio can become useful for structured, reproducible editorial production without attempting pixel-perfect manual page composition in its first stages.
 
@@ -44,6 +47,20 @@ Possible future packaging models:
 - embedded workflow inside a downstream product such as TRURL
 
 The first design work should remain implementation-neutral.
+
+## Core And Studio Boundary
+
+OSER Core should remain a lightweight, modular, reusable engine. Studio is an optional app or reference client that consumes Core packages.
+
+This boundary means:
+
+- Core does not depend on Studio.
+- Studio does not turn OSER into a monolithic app framework.
+- CLI and API workflows remain usable without Studio.
+- TRURL, diegomadero.com, CI jobs, static site workflows, and other tools can consume OSER Core directly.
+- Generated outputs remain reproducible from source files, profiles, and Core commands.
+
+If `apps/studio/` exists inside the repository, it should be treated as an optional reference app or development surface. If `packages/studio-server/` exists, it should be treated as a Studio adapter, not as an OSER Core package required by importers, renderers, diagnostics, or exporters.
 
 ## Core Concepts
 
@@ -188,12 +205,46 @@ Task-oriented export controls:
 
 Export should feel like a reproducible build step, not a manual screen capture.
 
+## MVP Flow
+
+The first functional Studio MVP should be deliberately narrow:
+
+1. Use known fixtures such as `examples/example.md` or `examples/editorial-sample.md`.
+2. Show source content in a read-only panel.
+3. Select a known `LayoutProfile` from `examples/profiles/`.
+4. Validate through OSER diagnostics.
+5. Render semantic HTML with the selected profile.
+6. Show generated HTML in an iframe preview.
+7. Show diagnostics in a dedicated panel.
+8. Export PDF through the experimental PDF renderer.
+9. Write generated artifacts under `dist/studio/`.
+
+The MVP should not include unrestricted filesystem browsing, real Git workflows, DOCX import, or freeform visual editing.
+
+## What Studio Is Not
+
+Studio is not required to use OSER.
+
+Studio is not a replacement for the CLI.
+
+Studio is not the source of truth for documents or outputs.
+
+Studio is not an InDesign clone in the first phase.
+
+Studio is not a dependency for server-side editorial pipelines.
+
+Studio is not the rendering engine; it calls OSER Core.
+
 ## First Version Limits
 
 The first Studio version should avoid:
 
 - freeform visual editing
 - complex drag-and-drop layout
+- unrestricted filesystem access
+- real Git workflow control
+- DOCX import
+- Tauri or Electron packaging
 - multi-user collaboration
 - pixel-perfect page composition
 - full replacement of InDesign or Scribus
