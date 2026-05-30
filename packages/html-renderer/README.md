@@ -13,6 +13,7 @@ Current scope:
 - deterministic indentation
 - optional link to the basic editorial stylesheet
 - optional generated `LayoutProfile` CSS through the CLI
+- optional successful-render manifest JSON through `--manifest`
 
 ## CLI Usage
 
@@ -24,6 +25,7 @@ npm run render:html -- examples/example.md dist/examples/plain.html --style none
 npm run render:html -- examples/example.md dist/examples/custom.html --style path/to/custom.css
 npm run render:html -- examples/example.md dist/examples/example-print.html --style packages/html-renderer/styles/print.css
 npm run render:html -- examples/editorial-sample.md dist/examples/editorial-sample-profile.html --profile examples/profiles/classic-book.json
+npm run render:html -- examples/editorial-sample.md dist/examples/editorial.html --profile examples/profiles/classic-book.json --manifest dist/examples/editorial.manifest.json
 ```
 
 The CLI currently supports `.txt`, `.md`, and `.markdown` inputs through the importers package.
@@ -41,6 +43,8 @@ Use `--style none` to emit semantic HTML without a stylesheet link. Use `--style
 Use `--profile <path.json>` to generate CSS from a `LayoutProfile` and link it after the default `editorial.css` base stylesheet. Generated profile CSS is written to `dist/.tmp/layout-profiles/<profile-name>.css`.
 
 `--style` and `--profile` are mutually exclusive. Passing both fails with a clear error so a command does not silently mix two custom layout sources.
+
+Use `--manifest <path.json>` to write a JSON manifest after a successful render. The manifest records source path, inferred input format, target, style/profile paths, generated CSS, HTML output, and diagnostics. If the render fails, no partial manifest is written.
 
 ## Stylesheets
 

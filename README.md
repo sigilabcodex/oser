@@ -32,6 +32,7 @@ The current repository contains these package boundaries:
 - `@oser/pdf-renderer`: experimental PDF export adapter using Playwright and Chromium.
 - `@oser/diagnostics`: initial validation and diagnostics for imported documents.
 - `@oser/layout-profile`: experimental typed layout profile objects and CSS generation for future Studio workflows.
+- `@oser/render-manifest`: optional JSON manifests for successful render/export runs.
 
 ## Supported Inputs
 
@@ -71,6 +72,7 @@ npm run render:html -- examples/example.md dist/examples/example.html
 npm run render:html -- examples/example.md dist/examples/plain.html --style none
 npm run render:html -- examples/example.md dist/examples/example-print.html --style packages/html-renderer/styles/print.css
 npm run render:html -- examples/editorial-sample.md dist/examples/editorial-sample-profile.html --profile examples/profiles/classic-book.json
+npm run render:html -- examples/editorial-sample.md dist/examples/editorial.html --profile examples/profiles/classic-book.json --manifest dist/examples/editorial.manifest.json
 ```
 
 Generate the HTML examples:
@@ -99,13 +101,15 @@ npm run profile:css -- examples/profiles/classic-book.json dist/examples/classic
 
 The generated CSS is also used automatically when `render:html` or `render:pdf` receives `--profile`. Generated profile CSS is written under `dist/.tmp/layout-profiles/` unless a command asks for an explicit output path.
 
+Render commands can also write an optional successful-run manifest with `--manifest <path.json>`. The manifest records source, render settings, generated outputs, profile CSS, and diagnostics without changing the document model or making manifests mandatory.
+
 Run the smoke test suite:
 
 ```bash
 npm run test
 ```
 
-The current test command builds the project, checks TXT and Markdown importers, renders HTML with different stylesheet options, validates a sample document, and verifies expected image, table, and stylesheet output.
+The current test command builds the project, checks TXT and Markdown importers, renders HTML with different stylesheet options, validates a sample document, and verifies expected image, table, stylesheet, and manifest output.
 
 ## Experimental PDF Export
 
@@ -116,6 +120,7 @@ npm run render:pdf -- examples/example.md dist/examples/example.pdf
 npm run render:pdf -- examples/editorial-sample.md dist/examples/editorial-sample.pdf --format Letter
 npm run render:pdf -- examples/editorial-sample.md dist/examples/editorial-sample.pdf --html-output dist/examples/editorial-sample-print.html
 npm run render:pdf -- examples/editorial-sample.md dist/examples/editorial-sample-profile.pdf --profile examples/profiles/classic-book.json
+npm run render:pdf -- examples/editorial-sample.md dist/examples/editorial.pdf --profile examples/profiles/classic-book.json --manifest dist/examples/editorial-pdf.manifest.json
 ```
 
 The PDF pipeline currently uses:

@@ -36,6 +36,12 @@ Experimental typed layout profile objects and CSS generation.
 
 It provides a first declarative layer for future Studio layout controls without replacing `editorial.css`, `print.css`, or the current renderers.
 
+### `render-manifest`
+
+Optional JSON manifest helpers for successful render and export runs.
+
+It records source paths, render settings, generated outputs, profile CSS, and diagnostics so future Studio, TRURL, and automation workflows can consume render results without scraping `dist/`.
+
 ### `pdf-renderer`
 
 Experimental PDF export adapter.

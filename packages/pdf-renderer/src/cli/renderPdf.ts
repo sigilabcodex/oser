@@ -4,7 +4,7 @@ async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
 
   if (!args.inputPath) {
-    console.error("Usage: npm run render:pdf -- <input.txt|input.md> [output.pdf] [--style path/to/file.css] [--profile path/to/profile.json] [--format Letter|A4] [--html-output path/to/file.html]");
+    console.error("Usage: npm run render:pdf -- <input.txt|input.md> [output.pdf] [--style path/to/file.css] [--profile path/to/profile.json] [--format Letter|A4] [--html-output path/to/file.html] [--manifest path/to/manifest.json]");
     process.exitCode = 1;
     return;
   }
@@ -19,11 +19,11 @@ async function main(): Promise<void> {
     stylePath: args.stylePath,
     profilePath: args.profilePath,
     format: args.format,
-    htmlOutputPath: args.htmlOutputPath
+    htmlOutputPath: args.htmlOutputPath,
+    manifestPath: args.manifestPath
   });
 
-  process.stdout.write(`${result.outputPath}
-`);
+  process.stdout.write(`${result.outputPath}\n`);
 }
 
 type CliArgs = {
@@ -33,6 +33,7 @@ type CliArgs = {
   profilePath?: string;
   format?: PdfPageFormat;
   htmlOutputPath?: string;
+  manifestPath?: string;
 };
 
 function parseArgs(args: string[]): CliArgs {
@@ -62,6 +63,12 @@ function parseArgs(args: string[]): CliArgs {
 
     if (arg === "--html-output") {
       parsed.htmlOutputPath = readOptionValue(args, index, "--html-output");
+      index += 1;
+      continue;
+    }
+
+    if (arg === "--manifest") {
+      parsed.manifestPath = readOptionValue(args, index, "--manifest");
       index += 1;
       continue;
     }

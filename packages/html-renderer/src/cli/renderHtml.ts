@@ -1,7 +1,9 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { basename, dirname, extname, isAbsolute, join, relative, resolve } from "node:path";
+import { validateOserDocument } from "../../../diagnostics/src";
 import { importMarkdownFile, importTxtFile } from "../../../importers/src";
 import { writeLayoutProfileCss } from "../../../layout-profile/src/profileCssFile";
+import { createRenderManifest, writeRenderManifest } from "../../../render-manifest/src";
 import { renderDocumentToHtml } from "../renderDocumentToHtml";
 
 const defaultEditorialStylePath = join("packages", "html-renderer", "styles", "editorial.css");
@@ -10,7 +12,7 @@ async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
 
   if (!args.inputPath) {
-    console.error("Usage: npm run render:html -- <input.txt|input.md> [output.html] [--style editorial|none|path/to/file.css] [--profile path/to/profile.json]");
+    console.error("Usage: npm run render:html -- <input.txt|input.md> [output.html] [--style editorial|none|path/to/file.css] [--profile path/to/profile.json] [--manifest path/to/manifest.json]");
     process.exitCode = 1;
     return;
   }
@@ -21,11 +23,33 @@ async function main(): Promise<void> {
 
   const outputPath = args.outputPath ?? defaultOutputPath(args.inputPath);
   const result = await importByExtension(args.inputPath);
-  const stylesheetHrefs = await stylesheetHrefsForOutput(outputPath, args);
-  const html = renderDocumentToHtml(result.document, { stylesheetHrefs });
+  const stylesheets = await stylesheetsForOutput(outputPath, args);
+  const html = renderDocumentToHtml(result.document, { stylesheetHrefs: stylesheets.hrefs });
 
   await mkdir(dirname(outputPath), { recursive: true });
   await writeFile(outputPath, `${html}\n`, "utf8");
+
+  if (args.manifestPath) {
+    const diagnostics = validateOserDocument(result.document);
+    const manifest = createRenderManifest({
+      inputPath: args.inputPath,
+      target: "html",
+      profilePath: args.profilePath,
+      stylePath: stylesheets.stylePath,
+      generatedCssPath: stylesheets.generatedCssPath,
+      outputs: {
+        htmlPath: outputPath,
+        cssPaths: stylesheets.cssPaths,
+        manifestPath: args.manifestPath
+      },
+      diagnostics: {
+        summary: diagnostics.summary,
+        items: diagnostics.diagnostics
+      }
+    });
+    await writeRenderManifest(args.manifestPath, manifest);
+  }
+
   process.stdout.write(`${outputPath}\n`);
 }
 
@@ -35,6 +59,14 @@ type CliArgs = {
   style: string;
   styleExplicit: boolean;
   profilePath?: string;
+  manifestPath?: string;
+};
+
+type StylesheetResult = {
+  hrefs: string[];
+  cssPaths: string[];
+  stylePath?: string;
+  generatedCssPath?: string;
 };
 
 function parseArgs(args: string[]): CliArgs {
@@ -42,6 +74,7 @@ function parseArgs(args: string[]): CliArgs {
   let style = "editorial";
   let styleExplicit = false;
   let profilePath: string | undefined;
+  let manifestPath: string | undefined;
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
@@ -60,6 +93,12 @@ function parseArgs(args: string[]): CliArgs {
       continue;
     }
 
+    if (arg === "--manifest") {
+      manifestPath = readOptionValue(args, index, "--manifest");
+      index += 1;
+      continue;
+    }
+
     positional.push(arg);
   }
 
@@ -68,7 +107,8 @@ function parseArgs(args: string[]): CliArgs {
     outputPath: positional[1],
     style,
     styleExplicit,
-    profilePath
+    profilePath,
+    manifestPath
   };
 }
 
@@ -86,29 +126,36 @@ function defaultOutputPath(inputPath: string): string {
   return join(dirname(inputPath), `${name}.html`);
 }
 
-async function stylesheetHrefsForOutput(outputPath: string, args: CliArgs): Promise<string[]> {
+async function stylesheetsForOutput(outputPath: string, args: CliArgs): Promise<StylesheetResult> {
   if (args.profilePath) {
     const profileCss = await writeLayoutProfileCss({ profilePath: args.profilePath });
-    return [
-      cssPathToHref(outputPath, defaultEditorialStylePath),
-      cssPathToHref(outputPath, profileCss.cssPath)
-    ];
+    const cssPaths = [defaultEditorialStylePath, profileCss.cssPath];
+    return {
+      hrefs: cssPaths.map((cssPath) => cssPathToHref(outputPath, cssPath)),
+      cssPaths,
+      stylePath: defaultEditorialStylePath,
+      generatedCssPath: profileCss.cssPath
+    };
   }
 
-  const href = stylesheetHrefForOutput(outputPath, args.style);
-  return href ? [href] : [];
+  const stylePath = stylesheetPath(args.style);
+  return {
+    hrefs: stylePath ? [cssPathToHref(outputPath, stylePath)] : [],
+    cssPaths: stylePath ? [stylePath] : [],
+    stylePath
+  };
 }
 
-function stylesheetHrefForOutput(outputPath: string, style: string): string | undefined {
+function stylesheetPath(style: string): string | undefined {
   if (style === "none") {
     return undefined;
   }
 
   if (style !== "editorial") {
-    return cssPathToHref(outputPath, style);
+    return style;
   }
 
-  return cssPathToHref(outputPath, defaultEditorialStylePath);
+  return defaultEditorialStylePath;
 }
 
 function cssPathToHref(outputPath: string, cssPath: string): string {
