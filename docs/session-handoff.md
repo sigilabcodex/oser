@@ -68,7 +68,7 @@ El documento fuente sigue siendo el artefacto primario. HTML, CSS generado desde
 - No hay Paged.js todavia.
 - No hay integracion TRURL real todavia.
 - El PDF experimental no tiene folios ni running headers avanzados.
-- `LayoutProfile` todavia no esta integrado directamente en `render:html` ni `render:pdf`.
+- `LayoutProfile` ya esta integrado directamente en `render:html` y `render:pdf` mediante `--profile`.
 - La validacion de perfiles aun no es un schema validator completo.
 
 ## 5. Decisiones arquitectonicas importantes
@@ -81,21 +81,17 @@ El documento fuente sigue siendo el artefacto primario. HTML, CSS generado desde
 
 ## 6. Proximos pasos recomendados
 
-A. Integrar `--profile` en `render:html` y `render:pdf`.
+A. Crear primer spike TRURL -> OSER CLI.
 
-B. Crear primer spike TRURL -> OSER CLI.
+B. Disenar primer prototipo OSER Studio web-only.
 
-C. Disenar primer prototipo OSER Studio web-only.
+C. Investigar DOCX importer con Mammoth.
 
-D. Investigar DOCX importer con Mammoth.
+D. Explorar Paged.js despues de estabilizar perfiles.
 
-E. Explorar Paged.js despues de estabilizar perfiles.
+## 7. Nota para Studio
 
-## 7. Recomendacion para el siguiente primer paso
-
-Elegir A: integrar `--profile` en `render:html` y `render:pdf`.
-
-Justificacion: ya existe el paquete `@oser/layout-profile`, ya existe `profile:css`, y el gap inmediato es conectar esa capacidad declarativa con los renderers existentes. Este paso valida la arquitectura actual sin introducir GUI, sin depender de TRURL y sin adelantar Paged.js. Tambien deja una ruta clara para Studio: la futura UI podria seleccionar perfiles y llamar al mismo pipeline CLI/API.
+La integracion de `--profile` valida la ruta que Studio puede reutilizar despues: una futura UI podria seleccionar perfiles y llamar al mismo pipeline CLI/API sin duplicar renderers ni acoplar Studio al core.
 
 ## 8. Comandos de verificacion para manana
 
