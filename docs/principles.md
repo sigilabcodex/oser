@@ -22,6 +22,14 @@ HTML should be meaningful, inspectable, and stable enough for downstream tools t
 
 Rendering belongs in reusable packages and APIs. User interfaces, site integrations, product workflows, and deployment logic should call into OSER rather than embedding renderer logic.
 
+OSER Studio, if implemented, should be an optional client of OSER Core. Core should not import Studio code, require Studio dependencies, or hide rendering behavior behind Studio-only state.
+
+## Core First, UI Optional
+
+The CLI and package APIs should remain usable without Studio.
+
+Studio can make the pipeline easier to inspect and operate, but generated outputs must remain reproducible from source files, profiles, and Core commands. This keeps OSER useful for developers, automation, TRURL, diegomadero.com, and server-side editorial workflows.
+
 ## No WYSIWYG Initially
 
 OSER should not begin as a visual editor. A future GUI can help inspect, preview, validate, and export documents, but the first priority is a reliable import/render/export pipeline.

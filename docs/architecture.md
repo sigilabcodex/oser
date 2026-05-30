@@ -129,6 +129,16 @@ OSER core should stay separate from:
 
 Downstream projects can provide those layers while reusing OSER for document import, rendering, diagnostics, and export.
 
+## OSER Core And Studio
+
+OSER Core must not depend on OSER Studio.
+
+A future `apps/studio/` directory may live in this repository as an optional reference app or development surface. That placement should not make Studio part of the core package graph. Core packages should remain usable from CLIs, scripts, CI jobs, TRURL, diegomadero.com, static publishing workflows, and other integrations without running Studio.
+
+If a `packages/studio-server/` package exists, it should be an optional adapter for the Studio app. It should call Core APIs and write Studio outputs, but Core importers, renderers, diagnostics, profiles, and exporters should not import from it.
+
+Studio can edit profiles, choose export settings, preview generated artifacts, and display diagnostics. It should not become the rendering engine or the source of truth for outputs.
+
 ## Future Architecture Work
 
 Likely future layers include:
