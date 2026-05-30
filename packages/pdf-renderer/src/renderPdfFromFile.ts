@@ -4,6 +4,7 @@ import { pathToFileURL } from "node:url";
 import { chromium } from "playwright";
 import { importMarkdownFile, importTxtFile } from "../../importers/src";
 import { renderDocumentToHtml } from "../../html-renderer/src";
+import { writeLayoutProfileCss } from "../../layout-profile/src/profileCssFile";
 
 export type PdfPageFormat = "Letter" | "A4";
 
@@ -11,6 +12,8 @@ export type RenderPdfFromFileOptions = {
   inputPath: string;
   outputPath?: string;
   stylePath?: string;
+  profilePath?: string;
+  generatedCssPath?: string;
   format?: PdfPageFormat;
   htmlOutputPath?: string;
 };
@@ -20,27 +23,35 @@ export type RenderPdfFromFileResult = {
   outputPath: string;
   htmlOutputPath: string;
   stylePath: string;
+  stylesheetPaths: string[];
+  profilePath?: string;
+  generatedCssPath?: string;
   format: PdfPageFormat;
 };
 
 const defaultStylePath = join("packages", "html-renderer", "styles", "print.css");
 
 export async function renderPdfFromFile(options: RenderPdfFromFileOptions): Promise<RenderPdfFromFileResult> {
+  if (options.profilePath && options.stylePath) {
+    throw new Error("Use either profilePath or stylePath, not both. A profile generates CSS on top of the default print stylesheet.");
+  }
+
   const outputPath = options.outputPath ?? defaultOutputPath(options.inputPath);
   const htmlOutputPath = options.htmlOutputPath ?? temporaryHtmlPath(options.inputPath);
-  const stylePath = options.stylePath ?? defaultStylePath;
   const format = options.format ?? "Letter";
+  const profileCss = options.profilePath
+    ? await writeLayoutProfileCss({ profilePath: options.profilePath, outputPath: options.generatedCssPath })
+    : undefined;
+  const stylesheetPaths = profileCss
+    ? [defaultStylePath, profileCss.cssPath]
+    : [options.stylePath ?? defaultStylePath];
 
   const result = await importByExtension(options.inputPath);
-  const html = withPageFormatStyle(
-    withBaseHref(
-      renderDocumentToHtml(result.document, {
-        stylesheetHref: pathToFileURL(resolve(stylePath)).href
-      }),
-      dirname(resolve(options.inputPath))
-    ),
-    format
-  );
+  const renderedHtml = renderDocumentToHtml(result.document, {
+    stylesheetHrefs: stylesheetPaths.map((stylePath) => pathToFileURL(resolve(stylePath)).href)
+  });
+  const htmlWithBase = withBaseHref(renderedHtml, dirname(resolve(options.inputPath)));
+  const html = profileCss ? htmlWithBase : withPageFormatStyle(htmlWithBase, format);
 
   await mkdir(dirname(htmlOutputPath), { recursive: true });
   await mkdir(dirname(outputPath), { recursive: true });
@@ -67,7 +78,10 @@ export async function renderPdfFromFile(options: RenderPdfFromFileOptions): Prom
     inputPath: options.inputPath,
     outputPath,
     htmlOutputPath,
-    stylePath,
+    stylePath: stylesheetPaths[stylesheetPaths.length - 1],
+    stylesheetPaths,
+    profilePath: options.profilePath,
+    generatedCssPath: profileCss?.cssPath,
     format
   };
 }

@@ -24,6 +24,7 @@ import type {
 export type RenderHtmlOptions = {
   title?: string;
   stylesheetHref?: string;
+  stylesheetHrefs?: string[];
 };
 
 export function renderDocumentToHtml(
@@ -33,9 +34,10 @@ export function renderDocumentToHtml(
   const title = options.title ?? document.metadata.title ?? "Untitled document";
   const language = typeof document.metadata.language === "string" ? document.metadata.language : undefined;
   const htmlAttrs = language ? ` lang="${escapeAttribute(language)}"` : "";
-  const stylesheetLink = options.stylesheetHref
-    ? `    <link rel="stylesheet" href="${escapeAttribute(options.stylesheetHref)}">`
-    : "";
+  const stylesheetHrefs = options.stylesheetHrefs ?? (options.stylesheetHref ? [options.stylesheetHref] : []);
+  const stylesheetLinks = stylesheetHrefs
+    .map((href) => `    <link rel="stylesheet" href="${escapeAttribute(href)}">`)
+    .join("\n");
   const body = renderBlocks(document.children, 3);
 
   return [
@@ -45,7 +47,7 @@ export function renderDocumentToHtml(
     "    <meta charset=\"utf-8\">",
     "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">",
     `    <title>${escapeText(title)}</title>`,
-    stylesheetLink,
+    stylesheetLinks,
     "  </head>",
     "  <body>",
     "    <main>",

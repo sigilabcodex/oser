@@ -12,6 +12,7 @@ Current scope:
 - HTML escaping for text and attributes
 - deterministic indentation
 - optional link to the basic editorial stylesheet
+- optional generated `LayoutProfile` CSS through the CLI
 
 ## CLI Usage
 
@@ -22,6 +23,7 @@ npm run render:html -- examples/example.md dist/examples/example.html
 npm run render:html -- examples/example.md dist/examples/plain.html --style none
 npm run render:html -- examples/example.md dist/examples/custom.html --style path/to/custom.css
 npm run render:html -- examples/example.md dist/examples/example-print.html --style packages/html-renderer/styles/print.css
+npm run render:html -- examples/editorial-sample.md dist/examples/editorial-sample-profile.html --profile examples/profiles/classic-book.json
 ```
 
 The CLI currently supports `.txt`, `.md`, and `.markdown` inputs through the importers package.
@@ -35,6 +37,10 @@ packages/html-renderer/styles/editorial.css
 ```
 
 Use `--style none` to emit semantic HTML without a stylesheet link. Use `--style <path.css>` to link a project stylesheet instead. Relative CSS paths are converted to an href relative to the output HTML file.
+
+Use `--profile <path.json>` to generate CSS from a `LayoutProfile` and link it after the default `editorial.css` base stylesheet. Generated profile CSS is written to `dist/.tmp/layout-profiles/<profile-name>.css`.
+
+`--style` and `--profile` are mutually exclusive. Passing both fails with a clear error so a command does not silently mix two custom layout sources.
 
 ## Stylesheets
 

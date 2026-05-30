@@ -4,26 +4,33 @@ async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
 
   if (!args.inputPath) {
-    console.error("Usage: npm run render:pdf -- <input.txt|input.md> [output.pdf] [--style path/to/file.css] [--format Letter|A4] [--html-output path/to/file.html]");
+    console.error("Usage: npm run render:pdf -- <input.txt|input.md> [output.pdf] [--style path/to/file.css] [--profile path/to/profile.json] [--format Letter|A4] [--html-output path/to/file.html]");
     process.exitCode = 1;
     return;
+  }
+
+  if (args.profilePath && args.stylePath) {
+    throw new Error("Use either --profile or --style, not both. A profile generates its own CSS on top of the default print stylesheet.");
   }
 
   const result = await renderPdfFromFile({
     inputPath: args.inputPath,
     outputPath: args.outputPath,
     stylePath: args.stylePath,
+    profilePath: args.profilePath,
     format: args.format,
     htmlOutputPath: args.htmlOutputPath
   });
 
-  process.stdout.write(`${result.outputPath}\n`);
+  process.stdout.write(`${result.outputPath}
+`);
 }
 
 type CliArgs = {
   inputPath?: string;
   outputPath?: string;
   stylePath?: string;
+  profilePath?: string;
   format?: PdfPageFormat;
   htmlOutputPath?: string;
 };
@@ -37,6 +44,12 @@ function parseArgs(args: string[]): CliArgs {
 
     if (arg === "--style") {
       parsed.stylePath = readOptionValue(args, index, "--style");
+      index += 1;
+      continue;
+    }
+
+    if (arg === "--profile") {
+      parsed.profilePath = readOptionValue(args, index, "--profile");
       index += 1;
       continue;
     }

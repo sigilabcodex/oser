@@ -1,6 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
-import { layoutProfileToCss, type LayoutProfile } from "../index";
+import { writeLayoutProfileCss } from "../profileCssFile";
 
 async function main(): Promise<void> {
   const [, , inputPath, outputPath] = process.argv;
@@ -11,12 +9,9 @@ async function main(): Promise<void> {
     return;
   }
 
-  const profile = JSON.parse(await readFile(inputPath, "utf8")) as LayoutProfile;
-  const css = layoutProfileToCss(profile);
-
-  await mkdir(dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, `${css}\n`, "utf8");
-  process.stdout.write(`${outputPath}\n`);
+  const result = await writeLayoutProfileCss({ profilePath: inputPath, outputPath });
+  process.stdout.write(`${result.cssPath}
+`);
 }
 
 main().catch((error: unknown) => {

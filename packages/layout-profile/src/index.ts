@@ -426,3 +426,5 @@ export const defaultLayoutProfile: LayoutProfile = {
   },
   print: { enabled: true, breakHeadingsAfterAvoid: true, avoidBreakInsideBlocks: true, widows: 3, orphans: 3 }
 };
+
+export { loadLayoutProfile, writeLayoutProfileCss } from "./profileCssFile";

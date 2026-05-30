@@ -14,6 +14,7 @@ Current scope:
 - table defaults
 - basic print behavior
 - CLI for generating CSS from a profile JSON file
+- shared helper for render commands that need generated profile CSS
 
 ## CLI
 
@@ -21,26 +22,29 @@ Current scope:
 npm run profile:css -- examples/profiles/classic-book.json dist/examples/classic-book.css
 ```
 
-That command builds the TypeScript package and writes generated CSS to the requested output path.
+That command builds the TypeScript package and writes generated CSS to the requested output path. When `render:html` or `render:pdf` uses `--profile`, generated CSS is written automatically under `dist/.tmp/layout-profiles/`.
 
 ## Programmatic API
 
 ```ts
-import { layoutProfileToCss, type LayoutProfile } from "@oser/layout-profile";
+import { layoutProfileToCss, writeLayoutProfileCss, type LayoutProfile } from "@oser/layout-profile";
 
 const css = layoutProfileToCss(profile);
+const result = await writeLayoutProfileCss({ profilePath: "examples/profiles/classic-book.json" });
 ```
 
 In this repository, imports should currently use package source paths until public package publishing is formalized.
 
 ## Current Limits
 
-This package does not integrate with `render:html` or `render:pdf` yet. To test a generated profile manually, generate CSS and pass it to the existing renderer:
+`render:html` and `render:pdf` can consume a profile directly:
 
 ```bash
-npm run profile:css -- examples/profiles/classic-book.json dist/examples/classic-book.css
-npm run render:html -- examples/example.md dist/examples/profile-preview.html --style dist/examples/classic-book.css
+npm run render:html -- examples/editorial-sample.md dist/examples/editorial-sample-profile.html --profile examples/profiles/classic-book.json
+npm run render:pdf -- examples/editorial-sample.md dist/examples/editorial-sample-profile.pdf --profile examples/profiles/classic-book.json
 ```
+
+The direct `--profile` path keeps the renderer base stylesheet (`editorial.css` for HTML, `print.css` for PDF) and links generated profile CSS after it.
 
 The package does not implement:
 

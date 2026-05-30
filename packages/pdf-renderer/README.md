@@ -9,6 +9,7 @@ Markdown / TXT
   -> OserDocument
   -> semantic HTML
   -> print.css
+  -> optional generated LayoutProfile CSS
   -> PDF through Playwright / Chromium
 ```
 
@@ -20,6 +21,7 @@ It does not add Paged.js, folios, running headers, GUI behavior, or document-mod
 npm run render:pdf -- examples/example.md dist/examples/example.pdf
 npm run render:pdf -- examples/editorial-sample.md dist/examples/editorial-sample.pdf --format Letter
 npm run render:pdf -- examples/editorial-sample.md dist/examples/editorial-sample.pdf --html-output dist/examples/editorial-sample-print.html
+npm run render:pdf -- examples/editorial-sample.md dist/examples/editorial-sample-profile.pdf --profile examples/profiles/classic-book.json
 ```
 
 The default stylesheet is:
@@ -39,6 +41,16 @@ Use a custom print stylesheet with:
 ```bash
 npm run render:pdf -- examples/example.md dist/examples/example.pdf --style packages/html-renderer/styles/print.css
 ```
+
+Use a `LayoutProfile` with:
+
+```bash
+npm run render:pdf -- examples/editorial-sample.md dist/examples/editorial-sample-profile.pdf --profile examples/profiles/classic-book.json
+```
+
+When `--profile` is used, the PDF renderer keeps `print.css` as the base stylesheet and links generated profile CSS after it in the temporary HTML. Generated profile CSS is written under `dist/.tmp/layout-profiles/`.
+
+`--style` and `--profile` are mutually exclusive. Passing both fails instead of choosing a silent priority.
 
 If Chromium is not installed for Playwright, run:
 
