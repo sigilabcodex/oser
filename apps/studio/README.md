@@ -28,6 +28,7 @@ The frontend runs at `http://127.0.0.1:5173` and proxies `/api`, `/preview`, and
 - exports PDF through `POST /api/studio/export-pdf`
 - links to the generated PDF
 - displays diagnostics returned by the server
+- loads preview images through server allowlisted `/preview/assets/...` URLs
 
 ## Boundary
 
@@ -43,6 +44,7 @@ Studio is optional UI. Core remains usable from CLI commands, scripts, tests, an
 
 - read-only source panel
 - fixed server fixtures and allowlisted paths
+- preview asset handling is limited to known files under `examples/assets/`
 - no WYSIWYG editor
 - no project persistence
 - no Git/checkpoint workflow

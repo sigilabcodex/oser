@@ -76,6 +76,7 @@ Renders HTML through `renderHtmlFromFile(...)` and writes:
 - `dist/studio/preview.manifest.json`
 - `dist/studio/editorial.css`
 - `dist/studio/profile-*.css`
+- `dist/studio/assets/placeholder.svg`
 
 The response reads and returns the generated `RenderManifest`, plus `previewUrl`.
 
@@ -110,7 +111,7 @@ curl -X POST http://127.0.0.1:4317/api/studio/export-pdf \
 
 `GET /outputs/export.pdf` serves only the generated PDF export.
 
-The server does not expose a general filesystem browser.
+The server does not expose a general filesystem browser. The MVP copies `examples/assets/placeholder.svg` to `dist/studio/assets/placeholder.svg` during HTML render and serves it as `/preview/assets/placeholder.svg`.
 
 ## Curl Smoke Test
 

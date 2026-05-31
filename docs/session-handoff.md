@@ -1,104 +1,118 @@
 # OSER Session Handoff
 
-Fecha de cierre: 2026-05-27
+Fecha de cierre: 2026-05-30
 
-## 1. Estado actual del proyecto
+## 1. Estado actual del repo
 
-OSER esta en estado de prototipo funcional temprano. El repositorio ya tiene una separacion clara entre modelo documental, importadores, renderers, diagnosticos, perfiles de layout y exportacion PDF experimental.
+### OSER Core
 
-Paquetes existentes:
+OSER Core esta en estado de prototipo funcional temprano. Ya cuenta con:
 
-- `@oser/document-model`: contratos TypeScript para `OserDocument`.
-- `@oser/importers`: importadores TXT y Markdown hacia `OserDocument`.
-- `@oser/html-renderer`: render semantic HTML y enlace opcional a CSS.
-- `@oser/pdf-renderer`: adaptador PDF experimental con Playwright / Chromium.
-- `@oser/diagnostics`: validacion inicial de documentos importados.
-- `@oser/layout-profile`: schema declarativo experimental y generacion CSS desde perfiles.
+- importadores TXT/Markdown hacia `OserDocument`;
+- `OserDocument` como modelo documental comun;
+- diagnostics basicos;
+- `html-renderer` con `renderDocumentToHtml(...)` y `renderHtmlFromFile(...)`;
+- `pdf-renderer` con `renderPdfFromFile(...)`;
+- `layout-profile` para compilar perfiles JSON a CSS;
+- `render-manifest` como contrato de outputs, settings y diagnostics;
+- CLIs `render:html`, `render:pdf`, `validate` y `profile:css`.
 
-Comandos npm actuales:
+Core no depende de Studio, React, Vite ni `studio-server`.
 
-- `npm run build`: compila TypeScript.
-- `npm run import:markdown -- <input>`: importa Markdown a `OserDocument`.
-- `npm run import:txt -- <input>`: importa TXT a `OserDocument`.
-- `npm run render:html -- <input> <output> [--style <css|none>]`: renderiza HTML semantico.
-- `npm run render:pdf -- <input> <output> [--format <format>] [--style <css>] [--html-output <path>]`: genera PDF experimental.
-- `npm run render:examples`: genera ejemplos HTML en `dist/examples/`.
-- `npm run render:examples:pdf`: genera PDFs de ejemplo en `dist/examples/`.
-- `npm run validate -- <input>`: ejecuta diagnosticos.
-- `npm run profile:css -- <profile.json> <output.css>`: genera CSS desde un `LayoutProfile`.
-- `npm run test`: smoke test de build, importadores, HTML renderer y diagnosticos.
+### studio-server
 
-Que funciona hoy:
+`packages/studio-server` existe como adapter HTTP local, experimental y opcional. Usa Node HTTP nativo y consume APIs reutilizables de Core.
 
-- Importar `.txt`, `.md` y `.markdown`.
-- Producir `OserDocument` desde los importadores actuales.
-- Renderizar semantic HTML reproducible.
-- Usar `editorial.css`, `print.css` o `--style none` en HTML.
-- Ejecutar diagnosticos basicos sobre documentos importados.
-- Generar CSS desde perfiles declarativos JSON.
-- Generar PDFs experimentales mediante Playwright / Chromium usando `print.css` por defecto.
+Endpoints actuales:
 
-## 2. Pipeline actual
+- `GET /api/studio/document`
+- `GET /api/studio/profiles`
+- `POST /api/studio/validate`
+- `POST /api/studio/render-html`
+- `POST /api/studio/export-pdf`
+- `GET /preview/preview.html`
+- `GET /preview/editorial.css`
+- `GET /preview/profile-classic-book.css`
+- `GET /preview/profile-report.css`
+- `GET /preview/assets/placeholder.svg`
+- `GET /outputs/export.pdf`
+
+El server mantiene allowlists para fixtures conocidos y outputs bajo `dist/studio/`.
+
+### apps/studio
+
+`apps/studio` existe como app Vite + React + TypeScript minima. Consume `studio-server` mediante HTTP/proxy. No implementa render, diagnostics, export PDF ni logica editorial en el frontend.
+
+## 2. Pipeline actual confirmado
 
 ```text
-TXT / Markdown
+Markdown / TXT
   -> OserDocument
   -> diagnostics
-  -> semantic HTML
-  -> editorial.css / print.css / LayoutProfile CSS
-  -> PDF experimental
+  -> LayoutProfile
+  -> HTML preview
+  -> PDF export
+  -> RenderManifest
 ```
 
-El documento fuente sigue siendo el artefacto primario. HTML, CSS generado desde perfiles y PDF son artefactos derivados y deben poder regenerarse desde fuente, configuracion y renderer settings.
+HTML preview y PDF export escriben manifests. Studio consume esos manifests como contrato de outputs y diagnostics.
 
-## 3. Hitos implementados hoy
+## 3. Que funciona en la GUI
 
-- PDF renderer reusable: `@oser/pdf-renderer` compone importadores, HTML renderer, `print.css` y Playwright / Chromium.
-- Diagnostics: `@oser/diagnostics` valida estructura basica y expone CLI con `npm run validate`.
-- Documentacion actualizada: README principal, paquetes y docs de arquitectura/flujo reflejan el prototipo actual.
-- OSER Studio UX docs: se documento Studio como superficie visual sobre OSER Core, no como motor.
-- LayoutProfile schema: existe una capa typed/declarativa para expresar intencion de layout.
-- `profile:css`: CLI para convertir perfiles JSON en CSS derivado.
+- Carga source desde `GET /api/studio/document`.
+- Carga perfiles desde `GET /api/studio/profiles`.
+- Muestra Markdown read-only.
+- Permite seleccionar perfil.
+- `Validate` llama `POST /api/studio/validate`.
+- `Render HTML` llama `POST /api/studio/render-html`.
+- Muestra preview en iframe usando `previewUrl`.
+- `Export PDF` llama `POST /api/studio/export-pdf`.
+- Muestra link al PDF usando `pdfUrl`.
+- Muestra diagnostics devueltos por el server.
 
-## 4. Limitaciones actuales
+## 4. Que se corrigio hoy
 
-- No hay import DOCX/RTF/ODT todavia.
-- No hay EPUB todavia.
-- No hay GUI todavia.
-- No hay Paged.js todavia.
-- No hay integracion TRURL real todavia.
-- El PDF experimental no tiene folios ni running headers avanzados.
-- `LayoutProfile` ya esta integrado directamente en `render:html` y `render:pdf` mediante `--profile`.
-- La validacion de perfiles aun no es un schema validator completo.
+- Se creo `renderHtmlFromFile(...)` como API reusable de `html-renderer`.
+- El CLI `renderHtml.ts` delega en `renderHtmlFromFile(...)` sin cambiar comportamiento publico.
+- `studio-server` usa APIs reusables: `renderHtmlFromFile(...)` y `renderPdfFromFile(...)`.
+- Se creo el frontend OSER Studio MVP en `apps/studio`.
+- Se corrigio asset handling del preview: `examples/assets/placeholder.svg` se copia a `dist/studio/assets/placeholder.svg` y se sirve por allowlist como `/preview/assets/placeholder.svg`.
+- Se endurecio el serving de assets para rechazar dot-segments y `%2e` en rutas GET.
 
-## 5. Decisiones arquitectonicas importantes
+## 5. Limitaciones actuales
 
-- La GUI no debe ser el motor. OSER Studio debe llamar a OSER Core, no duplicar importers, renderers, diagnostics o export adapters.
-- `LayoutProfile` no es CSS crudo. Es una descripcion tipada de intencion editorial que puede compilar a CSS derivado.
-- OSER Core debe seguir separado de OSER Studio. Core mantiene modelo, importadores, diagnosticos, renderers y export adapters.
-- TRURL puede ser consumidor/host, no necesariamente el lugar final de Studio. Puede servir para spikes sin acoplar el producto final.
-- Git debe traducirse como checkpoints/variants para usuarios no tecnicos. Commits y branches deben existir como detalle tecnico, no como lenguaje primario.
+- Source read-only.
+- No hay edicion de `LayoutProfile` todavia.
+- No hay Git/checkpoints reales.
+- No hay DOCX/ODT/RTF.
+- No hay WebBook.
+- No hay Paged.js.
+- No hay Tauri/Electron.
+- Asset handling todavia es minimo y fixture-oriented.
+- Preview no es todavia paginacion final avanzada.
+- `studio-server` usa fixtures allowlisted; no hay file picker ni proyectos persistentes.
 
 ## 6. Proximos pasos recomendados
 
-A. Crear primer spike TRURL -> OSER CLI.
+A. Editor JSON simple para `LayoutProfile`.
 
-B. Disenar primer prototipo OSER Studio web-only.
+B. Refresh automatico del preview al cambiar perfil.
 
-C. Investigar DOCX importer con Mammoth.
+C. Mostrar `RenderManifest` completo en la UI.
 
-D. Explorar Paged.js despues de estabilizar perfiles.
+D. Mejorar asset pipeline.
 
-## 7. Nota para Studio
+E. Preparar primer spike de Git checkpoints.
 
-La integracion de `--profile` valida la ruta que Studio puede reutilizar despues: una futura UI podria seleccionar perfiles y llamar al mismo pipeline CLI/API sin duplicar renderers ni acoplar Studio al core.
+F. Luego pensar en DOCX importer.
 
-## 8. Comandos de verificacion para manana
+## 7. Comandos para retomar manana
 
 ```bash
 npm run build
 npm run test
-npm run validate -- examples/example.md
-npm run profile:css -- examples/profiles/classic-book.json dist/examples/classic-book.css
-npm run render:examples:pdf
+npm run studio:server
+npm run studio
 ```
+
+Para usar Studio MVP, correr `studio:server` y `studio` en dos terminales.

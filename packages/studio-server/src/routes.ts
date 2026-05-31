@@ -16,7 +16,13 @@ const maxBodyBytes = 64 * 1024;
 export async function handleStudioRequest(request: IncomingMessage, response: ServerResponse): Promise<void> {
   try {
     const method = request.method ?? "GET";
-    const url = new URL(request.url ?? "/", "http://127.0.0.1");
+    const rawUrl = request.url ?? "/";
+    const url = new URL(rawUrl, "http://127.0.0.1");
+
+    if (method === "GET" && hasPathTraversal(rawUrl)) {
+      sendJson(response, 403, errorResponse("path-not-allowed", "Path traversal is not allowed."));
+      return;
+    }
 
     if (method === "GET" && url.pathname === "/api/studio/document") {
       sendJson(response, 200, await getStudioDocument());
@@ -103,11 +109,17 @@ async function serveAllowedFile(urlPath: string, response: ServerResponse): Prom
   createReadStream(filePath).pipe(response);
 }
 
+function hasPathTraversal(rawUrl: string): boolean {
+  const rawPath = rawUrl.split("?")[0] ?? "";
+  return rawPath.includes("..") || /%2e/i.test(rawPath);
+}
+
 function isAllowedStaticRoute(pathname: string): boolean {
   return pathname === "/preview/preview.html"
     || pathname === "/preview/editorial.css"
     || pathname === "/preview/profile-classic-book.css"
     || pathname === "/preview/profile-report.css"
+    || pathname === "/preview/assets/placeholder.svg"
     || pathname === "/outputs/export.pdf";
 }
 
@@ -135,6 +147,8 @@ function contentTypeForPath(filePath: string): string {
       return "application/pdf";
     case ".css":
       return "text/css; charset=utf-8";
+    case ".svg":
+      return "image/svg+xml; charset=utf-8";
     default:
       return "application/octet-stream";
   }

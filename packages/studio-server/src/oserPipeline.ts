@@ -1,5 +1,5 @@
 import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { validateOserDocument } from "../../diagnostics/src";
 import { defaultEditorialStylePath, renderHtmlFromFile } from "../../html-renderer/src";
 import { importMarkdownFile, importTxtFile } from "../../importers/src";
@@ -14,6 +14,7 @@ import {
   studioExportManifestPath,
   studioExportPdfPath,
   studioOutputDirectory,
+  studioPreviewAssetsDirectory,
   studioPreviewHtmlPath,
   studioPreviewManifestPath,
   studioPreviewStylePath
@@ -69,6 +70,7 @@ export async function renderStudioHtml(request: StudioRenderRequest = {}): Promi
 
   await mkdir(studioOutputDirectory, { recursive: true });
   await copyFile(defaultEditorialStylePath, studioPreviewStylePath);
+  await copyPreviewAssets();
 
   const result = await renderHtmlFromFile({
     inputPath: sourcePath,
@@ -117,6 +119,14 @@ async function importByExtension(inputPath: string) {
   }
 
   return importTxtFile(inputPath);
+}
+
+async function copyPreviewAssets(): Promise<void> {
+  await mkdir(studioPreviewAssetsDirectory, { recursive: true });
+  await copyFile(
+    join("examples", "assets", "placeholder.svg"),
+    join(studioPreviewAssetsDirectory, "placeholder.svg")
+  );
 }
 
 function profileCssFileName(profilePath: string): string {

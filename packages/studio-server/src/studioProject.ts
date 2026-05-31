@@ -8,6 +8,7 @@ export const studioPort = 4317;
 export const studioOutputDirectory = "dist/studio";
 export const studioPreviewHtmlPath = "dist/studio/preview.html";
 export const studioPreviewStylePath = "dist/studio/editorial.css";
+export const studioPreviewAssetsDirectory = "dist/studio/assets";
 export const studioPreviewManifestPath = "dist/studio/preview.manifest.json";
 export const studioExportPdfPath = "dist/studio/export.pdf";
 export const studioExportHtmlPath = "dist/studio/export.html";
@@ -31,6 +32,7 @@ const allowedServedFiles = new Map<string, string>([
   ["/preview/editorial.css", studioPreviewStylePath],
   ["/preview/profile-classic-book.css", `${studioOutputDirectory}/profile-classic-book.css`],
   ["/preview/profile-report.css", `${studioOutputDirectory}/profile-report.css`],
+  ["/preview/assets/placeholder.svg", `${studioPreviewAssetsDirectory}/placeholder.svg`],
   ["/outputs/export.pdf", studioExportPdfPath]
 ]);
 
