@@ -1,6 +1,6 @@
 # OSER Studio Server
 
-`packages/studio-server` is an experimental, optional local adapter for a future OSER Studio GUI. It exposes a small HTTP API over OSER Core operations without moving importer, diagnostics, HTML rendering, PDF rendering, layout profile, or render manifest logic into the server.
+`packages/studio-server` is an experimental, optional local adapter for a future OSER Studio GUI. It exposes a small HTTP API over reusable OSER Core operations without moving importer, diagnostics, HTML rendering, PDF rendering, layout profile, or render manifest logic into the server.
 
 No React, Vite, Electron, Tauri, or GUI app is included in this MVP.
 
@@ -70,7 +70,7 @@ curl -X POST http://127.0.0.1:4317/api/studio/validate \
 
 ### `POST /api/studio/render-html`
 
-Renders HTML through OSER Core and writes:
+Renders HTML through `renderHtmlFromFile(...)` and writes:
 
 - `dist/studio/preview.html`
 - `dist/studio/preview.manifest.json`
@@ -89,7 +89,7 @@ curl -X POST http://127.0.0.1:4317/api/studio/render-html \
 
 ### `POST /api/studio/export-pdf`
 
-Exports PDF through OSER Core and writes:
+Exports PDF through `renderPdfFromFile(...)` and writes:
 
 - `dist/studio/export.pdf`
 - `dist/studio/export.manifest.json`
@@ -112,9 +112,29 @@ curl -X POST http://127.0.0.1:4317/api/studio/export-pdf \
 
 The server does not expose a general filesystem browser.
 
+## Curl Smoke Test
+
+With `npm run studio:server` running in one shell:
+
+```sh
+curl http://127.0.0.1:4317/api/studio/document
+curl http://127.0.0.1:4317/api/studio/profiles
+curl -X POST http://127.0.0.1:4317/api/studio/validate \
+  -H 'content-type: application/json' \
+  -d '{"sourcePath":"examples/editorial-sample.md"}'
+curl -X POST http://127.0.0.1:4317/api/studio/render-html \
+  -H 'content-type: application/json' \
+  -d '{"sourcePath":"examples/editorial-sample.md","profilePath":"examples/profiles/classic-book.json"}'
+curl http://127.0.0.1:4317/preview/preview.html
+curl -X POST http://127.0.0.1:4317/api/studio/export-pdf \
+  -H 'content-type: application/json' \
+  -d '{"sourcePath":"examples/editorial-sample.md","profilePath":"examples/profiles/report.json","format":"A4"}'
+curl -o /tmp/oser-studio-export.pdf http://127.0.0.1:4317/outputs/export.pdf
+```
+
 ## Render Manifest Contract
 
-Render endpoints request manifest generation and then read the generated manifest JSON before responding. The future GUI should treat `RenderManifest` as the contract for output paths, render target, profile metadata, generated CSS, and diagnostics.
+Render endpoints request manifest generation through reusable Core APIs and then return the generated `RenderManifest`. The future GUI should treat `RenderManifest` as the contract for output paths, render target, profile metadata, generated CSS, and diagnostics.
 
 ## Limitations
 

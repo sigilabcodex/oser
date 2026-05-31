@@ -16,6 +16,8 @@ export type RenderHtmlFromFileOptions = {
   stylePath?: string;
   profilePath?: string;
   manifestPath?: string;
+  baseStylePath?: string;
+  generatedCssPath?: string;
 };
 
 export type RenderHtmlFromFileResult = {
@@ -37,7 +39,7 @@ type StylesheetResult = {
   generatedCssPath?: string;
 };
 
-const defaultEditorialStylePath = join("packages", "html-renderer", "styles", "editorial.css");
+export const defaultEditorialStylePath = join("packages", "html-renderer", "styles", "editorial.css");
 
 export async function renderHtmlFromFile(
   options: RenderHtmlFromFileOptions
@@ -102,12 +104,16 @@ async function stylesheetsForOutput(
   options: RenderHtmlFromFileOptions
 ): Promise<StylesheetResult> {
   if (options.profilePath) {
-    const profileCss = await writeLayoutProfileCss({ profilePath: options.profilePath });
-    const cssPaths = [defaultEditorialStylePath, profileCss.cssPath];
+    const baseStylePath = options.baseStylePath ?? defaultEditorialStylePath;
+    const profileCss = await writeLayoutProfileCss({
+      profilePath: options.profilePath,
+      outputPath: options.generatedCssPath
+    });
+    const cssPaths = [baseStylePath, profileCss.cssPath];
     return {
       hrefs: cssPaths.map((cssPath) => cssPathToHref(outputPath, cssPath)),
       cssPaths,
-      stylePath: defaultEditorialStylePath,
+      stylePath: baseStylePath,
       generatedCssPath: profileCss.cssPath
     };
   }

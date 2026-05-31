@@ -1,16 +1,10 @@
 import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname, isAbsolute, relative, resolve } from "node:path";
+import { dirname } from "node:path";
 import { validateOserDocument } from "../../diagnostics/src";
-import { renderDocumentToHtml } from "../../html-renderer/src";
+import { defaultEditorialStylePath, renderHtmlFromFile } from "../../html-renderer/src";
 import { importMarkdownFile, importTxtFile } from "../../importers/src";
-import { writeLayoutProfileCss } from "../../layout-profile/src/profileCssFile";
 import { renderPdfFromFile, type PdfPageFormat } from "../../pdf-renderer/src/renderPdfFromFile";
-import {
-  createRenderManifest,
-  writeRenderManifest,
-  type RenderManifest,
-  type RenderManifestDiagnosticItem
-} from "../../render-manifest/src";
+import { type RenderManifest, type RenderManifestDiagnosticItem } from "../../render-manifest/src";
 import {
   resolveAllowedProfilePath,
   resolveAllowedSourcePath,
@@ -21,8 +15,8 @@ import {
   studioExportPdfPath,
   studioOutputDirectory,
   studioPreviewHtmlPath,
-  studioPreviewStylePath,
-  studioPreviewManifestPath
+  studioPreviewManifestPath,
+  studioPreviewStylePath
 } from "./studioProject";
 import type {
   StudioDocumentResponse,
@@ -31,8 +25,6 @@ import type {
   StudioRenderRequest,
   StudioValidateResponse
 } from "./types";
-
-const defaultEditorialStylePath = "packages/html-renderer/styles/editorial.css";
 
 export async function getStudioDocument(sourcePath?: string): Promise<StudioDocumentResponse> {
   const resolvedSourcePath = resolveAllowedSourcePath(sourcePath);
@@ -74,43 +66,21 @@ export async function validateStudioDocument(request: StudioRenderRequest = {}):
 export async function renderStudioHtml(request: StudioRenderRequest = {}): Promise<StudioRenderManifestResponse> {
   const sourcePath = resolveAllowedSourcePath(request.sourcePath);
   const profilePath = resolveAllowedProfilePath(request.profilePath, request.profileId);
-  const importResult = await importByExtension(sourcePath);
+
   await mkdir(studioOutputDirectory, { recursive: true });
   await copyFile(defaultEditorialStylePath, studioPreviewStylePath);
-  const profileCss = await writeLayoutProfileCss({
-    profilePath,
-    outputPath: `${studioOutputDirectory}/${profileCssFileName(profilePath)}`
-  });
-  const cssPaths = [studioPreviewStylePath, profileCss.cssPath];
-  const html = renderDocumentToHtml(importResult.document, {
-    stylesheetHrefs: cssPaths.map((cssPath) => cssPathToHref(studioPreviewHtmlPath, cssPath))
-  });
 
-  await mkdir(dirname(studioPreviewHtmlPath), { recursive: true });
-  await writeFile(studioPreviewHtmlPath, `${html}\n`, "utf8");
-
-  const diagnostics = validateOserDocument(importResult.document);
-  const manifest = createRenderManifest({
+  const result = await renderHtmlFromFile({
     inputPath: sourcePath,
-    target: "html",
+    outputPath: studioPreviewHtmlPath,
     profilePath,
-    stylePath: defaultEditorialStylePath,
-    generatedCssPath: profileCss.cssPath,
-    outputs: {
-      htmlPath: studioPreviewHtmlPath,
-      cssPaths,
-      manifestPath: studioPreviewManifestPath
-    },
-    diagnostics: {
-      summary: diagnostics.summary,
-      items: diagnostics.diagnostics
-    }
+    manifestPath: studioPreviewManifestPath,
+    baseStylePath: studioPreviewStylePath,
+    generatedCssPath: `${studioOutputDirectory}/${profileCssFileName(profilePath)}`
   });
-
-  await writeRenderManifest(studioPreviewManifestPath, manifest);
 
   return {
-    manifest: await readRenderManifest(studioPreviewManifestPath),
+    manifest: result.manifest ?? await readRenderManifest(studioPreviewManifestPath),
     previewUrl: "/preview/preview.html"
   };
 }
@@ -147,24 +117,6 @@ async function importByExtension(inputPath: string) {
   }
 
   return importTxtFile(inputPath);
-}
-
-function cssPathToHref(outputPath: string, cssPath: string): string {
-  if (isExternalHref(cssPath)) {
-    return cssPath;
-  }
-
-  const absoluteCssPath = isAbsolute(cssPath) ? cssPath : resolve(cssPath);
-  const absoluteOutputDir = resolve(dirname(outputPath));
-  return normalizeHref(relative(absoluteOutputDir, absoluteCssPath));
-}
-
-function isExternalHref(value: string): boolean {
-  return /^[a-z][a-z0-9+.-]*:/i.test(value) || value.startsWith("//");
-}
-
-function normalizeHref(value: string): string {
-  return value.split("\\").join("/");
 }
 
 function profileCssFileName(profilePath: string): string {
