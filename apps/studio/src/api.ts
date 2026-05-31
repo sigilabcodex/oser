@@ -1,0 +1,56 @@
+import type {
+  ExportPdfResponse,
+  ProfileListResponse,
+  RenderHtmlResponse,
+  StudioDocument,
+  StudioProfile,
+  ValidateResponse
+} from "./types";
+
+export async function fetchDocument(): Promise<StudioDocument> {
+  return requestJson<StudioDocument>("/api/studio/document");
+}
+
+export async function fetchProfiles(): Promise<StudioProfile[]> {
+  const response = await requestJson<ProfileListResponse>("/api/studio/profiles");
+  return response.profiles;
+}
+
+export async function validateDocument(sourcePath: string): Promise<ValidateResponse> {
+  return requestJson<ValidateResponse>("/api/studio/validate", {
+    method: "POST",
+    body: JSON.stringify({ sourcePath })
+  });
+}
+
+export async function renderHtml(sourcePath: string, profilePath: string): Promise<RenderHtmlResponse> {
+  return requestJson<RenderHtmlResponse>("/api/studio/render-html", {
+    method: "POST",
+    body: JSON.stringify({ sourcePath, profilePath })
+  });
+}
+
+export async function exportPdf(sourcePath: string, profilePath: string): Promise<ExportPdfResponse> {
+  return requestJson<ExportPdfResponse>("/api/studio/export-pdf", {
+    method: "POST",
+    body: JSON.stringify({ sourcePath, profilePath })
+  });
+}
+
+async function requestJson<T>(url: string, options: RequestInit = {}): Promise<T> {
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      "content-type": "application/json",
+      ...options.headers
+    }
+  });
+
+  const payload = await response.json() as T | { error?: { message?: string } };
+  if (!response.ok) {
+    const message = "error" in payload && payload.error?.message ? payload.error.message : response.statusText;
+    throw new Error(message);
+  }
+
+  return payload as T;
+}

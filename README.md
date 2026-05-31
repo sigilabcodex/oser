@@ -111,6 +111,22 @@ npm run test
 
 The current test command builds the project, checks TXT and Markdown importers, renders HTML with different stylesheet options, validates a sample document, and verifies expected image, table, stylesheet, and manifest output.
 
+## OSER Studio MVP
+
+The optional Studio MVP lives in `apps/studio/` and consumes `packages/studio-server/`. It is a Vite + React + TypeScript reference app for inspecting the fixed Studio fixture, selecting a layout profile, validating, rendering HTML preview, and exporting PDF.
+
+Run it with two terminals:
+
+```bash
+npm run studio:server
+```
+
+```bash
+npm run studio
+```
+
+The frontend runs at `http://127.0.0.1:5173` and proxies Studio API/output requests to the local server on `http://127.0.0.1:4317`. Studio remains outside OSER Core; the flow is `apps/studio -> packages/studio-server -> OSER Core APIs`.
+
 ## Experimental PDF Export
 
 OSER has an experimental PDF adapter:

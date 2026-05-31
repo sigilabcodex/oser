@@ -84,7 +84,7 @@ This model is appropriate only after OSER Core APIs are stable enough to publish
 
 ## Recommended MVP Shape
 
-For the first MVP, prefer documenting and validating the optional `studio-server` adapter before creating a GUI app. The current server contract lives in `docs/studio-server-contract.md`.
+For the first frontend MVP, `apps/studio/` is a small Vite + React + TypeScript reference app that consumes the optional `studio-server` adapter. The server contract lives in `docs/studio-server-contract.md`.
 
 A later monorepo reference app may still be useful because it reduces packaging friction while preserving boundaries.
 
@@ -109,7 +109,7 @@ dist/
     diagnostics.json
 ```
 
-A future app can be added later, after this adapter contract is stable.
+The current app is intentionally small and uses the adapter contract without making Studio part of Core.
 
 `packages/studio-server/` is not Core. It is a local adapter used by `apps/studio/` to call Core packages and write generated artifacts. If another project wants to call Core directly, it should not need this package.
 
