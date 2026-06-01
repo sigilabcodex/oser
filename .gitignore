@@ -28,3 +28,12 @@ coverage/
 .env
 .env.*
 !.env.example
+
+# Stress test generated outputs
+stress-tests/outputs/**
+!stress-tests/outputs/.gitkeep
+stress-tests/results/**/*.png
+stress-tests/results/**/*.pdf
+stress-tests/results/**/*.html
+stress-tests/results/**/*.epub
+stress-tests/private/**
