@@ -1,0 +1,1553 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="2200"
+   height="1450"
+   viewBox="0 0 2200 1450"
+   version="1.1"
+   id="svg502"
+   sodipodi:docname="oser_studio_gui_concept.svg"
+   inkscape:export-filename="oser_studio_gui_concept.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview504"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="0.57724138"
+     inkscape:cx="1134.7073"
+     inkscape:cy="809.8865"
+     inkscape:window-width="1920"
+     inkscape:window-height="1048"
+     inkscape:window-x="1920"
+     inkscape:window-y="15"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g220" />
+  <defs
+     id="defs10">
+    <style
+       id="style2">
+      .bg { fill: #eef0f2; }
+      .title { font-family: Inter, DejaVu Sans, Arial, sans-serif; font-size: 48px; font-weight: 850; fill: #171717; }
+      .subtitle { font-family: Inter, DejaVu Sans, Arial, sans-serif; font-size: 23px; fill: #555; }
+      .stage-title { font-family: Inter, DejaVu Sans, Arial, sans-serif; font-size: 22px; font-weight: 800; fill: #111; }
+      .label { font-family: Inter, DejaVu Sans, Arial, sans-serif; font-size: 15px; font-weight: 750; fill: #222; }
+      .small { font-family: Inter, DejaVu Sans, Arial, sans-serif; font-size: 13px; fill: #444; }
+      .tiny { font-family: Inter, DejaVu Sans, Arial, sans-serif; font-size: 11px; fill: #555; }
+      .mono { font-family: DejaVu Sans Mono, Consolas, monospace; font-size: 10.5px; fill: #333; }
+      .window { fill: #fbfbfb; stroke: #242424; stroke-width: 2.2; rx: 22; }
+      .bar { fill: #202124; rx: 22; }
+      .bar-flat { fill: #202124; }
+      .tab { fill: #34363a; rx: 10; }
+      .tab-on { fill: #f3f0e7; rx: 10; }
+      .panel { fill: #ffffff; stroke: #d7d7d7; stroke-width: 1.4; rx: 14; }
+      .panel-alt { fill: #f7f7f4; stroke: #d7d7d7; stroke-width: 1.4; rx: 14; }
+      .page { fill: #fffdfa; stroke: #c9c0ad; stroke-width: 1.5; rx: 2; }
+      .page-shadow { fill: #d7d2c8; opacity: 0.45; }
+      .chip { fill: #eef3ff; stroke: #a5b7d9; stroke-width: 1; rx: 12; }
+      .chip-green { fill: #eaf7ee; stroke: #9cc7a8; stroke-width: 1; rx: 12; }
+      .chip-warn { fill: #fff4cc; stroke: #d6b24a; stroke-width: 1; rx: 12; }
+      .chip-red { fill: #ffe8e8; stroke: #d18b8b; stroke-width: 1; rx: 12; }
+      .btn { fill: #111; rx: 10; }
+      .btn2 { fill: #f5f5f5; stroke: #bbb; stroke-width: 1; rx: 10; }
+      .line { stroke: #c8c8c8; stroke-width: 1.2; }
+      .accent { fill: #1f4f8f; }
+      .good { fill: #177245; }
+      .warn { fill: #a46a00; }
+      .bad { fill: #a33a3a; }
+      .arrow { stroke: #333; stroke-width: 2.5; fill: none; marker-end: url(#arrowhead); }
+      .soft-arrow { stroke: #777; stroke-width: 2; fill: none; marker-end: url(#arrowhead2); stroke-dasharray: 6 6; }
+    </style>
+    <marker
+       id="arrowhead"
+       markerWidth="12"
+       markerHeight="8"
+       refX="11"
+       refY="4"
+       orient="auto">
+      <polygon
+         points="0 0, 12 4, 0 8"
+         fill="#333"
+         id="polygon4" />
+    </marker>
+    <marker
+       id="arrowhead2"
+       markerWidth="10"
+       markerHeight="7"
+       refX="9"
+       refY="3.5"
+       orient="auto">
+      <polygon
+         points="0 0, 10 3.5, 0 7"
+         fill="#777"
+         id="polygon7" />
+    </marker>
+  </defs>
+  <rect
+     class="bg"
+     width="2200"
+     height="1450"
+     id="rect12" />
+  <text
+     class="title"
+     x="70"
+     y="82"
+     id="text14">OSER Studio — concepto de GUI por etapas</text>
+  <text
+     class="subtitle"
+     x="72"
+     y="122"
+     id="text16">Una herramienta editorial FLOSS, web-native y git-native: importar, diagnosticar, diseñar, ajustar y publicar.</text>
+  <!-- Stage 1 -->
+  <g
+     transform="translate(70,170)"
+     id="g116">
+    <text
+       class="stage-title"
+       x="0"
+       y="0"
+       id="text18">1 · Importar documento</text>
+    <rect
+       class="window"
+       x="0"
+       y="24"
+       width="980"
+       height="520"
+       id="rect20" />
+    <rect
+       class="bar"
+       x="0"
+       y="24"
+       width="980"
+       height="54"
+       id="rect22" />
+    <rect
+       class="bar-flat"
+       x="0"
+       y="52"
+       width="980"
+       height="26"
+       id="rect24" />
+    <circle
+       cx="28"
+       cy="51"
+       r="7"
+       fill="#ff6b6b"
+       id="circle26" />
+    <circle
+       cx="52"
+       cy="51"
+       r="7"
+       fill="#ffd166"
+       id="circle28" />
+    <circle
+       cx="76"
+       cy="51"
+       r="7"
+       fill="#06d6a0"
+       id="circle30" />
+    <text
+       class="small"
+       x="116"
+       y="56"
+       fill="#f2f2f2"
+       id="text32">OSER Studio / Nuevo proyecto editorial</text>
+    <rect
+       class="tab-on"
+       x="730"
+       y="38"
+       width="90"
+       height="28"
+       id="rect34" />
+    <text
+       class="tiny"
+       x="752"
+       y="56"
+       id="text36">Import</text>
+    <rect
+       class="tab"
+       x="826"
+       y="38"
+       width="72"
+       height="28"
+       id="rect38" />
+    <text
+       class="tiny"
+       x="844"
+       y="56"
+       fill="#eee"
+       id="text40">Review</text>
+    <rect
+       class="tab"
+       x="904"
+       y="38"
+       width="58"
+       height="28"
+       id="rect42" />
+    <text
+       class="tiny"
+       x="918"
+       y="56"
+       fill="#eee"
+       id="text44">Build</text>
+    <rect
+       class="panel"
+       x="26"
+       y="102"
+       width="255"
+       height="410"
+       id="rect46" />
+    <text
+       class="label"
+       x="48"
+       y="132"
+       id="text48">Fuentes admitidas</text>
+    <rect
+       class="chip"
+       x="47"
+       y="154"
+       width="75"
+       height="26"
+       id="rect50" />
+    <text
+       class="tiny"
+       x="63"
+       y="172"
+       id="text52">DOCX</text>
+    <rect
+       class="chip"
+       x="130"
+       y="154"
+       width="62"
+       height="26"
+       id="rect54" />
+    <text
+       class="tiny"
+       x="147"
+       y="172"
+       id="text56">ODT</text>
+    <rect
+       class="chip"
+       x="200"
+       y="154"
+       width="58"
+       height="26"
+       id="rect58" />
+    <text
+       class="tiny"
+       x="216"
+       y="172"
+       id="text60">RTF</text>
+    <rect
+       class="chip"
+       x="47"
+       y="188"
+       width="58"
+       height="26"
+       id="rect62" />
+    <text
+       class="tiny"
+       x="64"
+       y="206"
+       id="text64">MD</text>
+    <rect
+       class="chip"
+       x="112"
+       y="188"
+       width="58"
+       height="26"
+       id="rect66" />
+    <text
+       class="tiny"
+       x="128"
+       y="206"
+       id="text68">TXT</text>
+    <rect
+       class="chip"
+       x="178"
+       y="188"
+       width="76"
+       height="26"
+       id="rect70" />
+    <text
+       class="tiny"
+       x="194"
+       y="206"
+       id="text72">HTML</text>
+    <line
+       class="line"
+       x1="47"
+       y1="236"
+       x2="258"
+       y2="236"
+       id="line74" />
+    <text
+       class="small"
+       x="48"
+       y="266"
+       id="text76">Import adapters</text>
+    <text
+       class="tiny"
+       x="48"
+       y="292"
+       id="text78">• Mammoth / DOCX</text>
+    <text
+       class="tiny"
+       x="48"
+       y="315"
+       id="text80">• Pandoc fallback</text>
+    <text
+       class="tiny"
+       x="48"
+       y="338"
+       id="text82">• LibreOffice rescue</text>
+    <text
+       class="tiny"
+       x="48"
+       y="361"
+       id="text84">• Markdown/TXT native</text>
+    <rect
+       class="panel-alt"
+       x="310"
+       y="102"
+       width="640"
+       height="410"
+       id="rect86" />
+    <text
+       class="label"
+       x="338"
+       y="132"
+       id="text88">Importación semántica revisable</text>
+    <rect
+       x="340"
+       y="160"
+       width="580"
+       height="88"
+       rx="13"
+       fill="#fff"
+       stroke="#d6d6d6"
+       id="rect90" />
+    <text
+       class="small"
+       x="365"
+       y="190"
+       id="text92">documento_original.docx</text>
+    <text
+       class="tiny"
+       x="365"
+       y="214"
+       id="text94">Detectado: 7 estilos, 18 imágenes, 3 tablas, 42 headings</text>
+    <rect
+       class="btn"
+       x="780"
+       y="180"
+       width="112"
+       height="36"
+       id="rect96" />
+    <text
+       class="tiny"
+       x="803"
+       y="203"
+       fill="#fff"
+       id="text98">Importar</text>
+    <rect
+       x="340"
+       y="276"
+       width="580"
+       height="190"
+       rx="13"
+       fill="#fbfbfb"
+       stroke="#d6d6d6"
+       id="rect100" />
+    <text
+       class="label"
+       x="365"
+       y="306"
+       id="text102">Mapeo de estilos detectados</text>
+    <text
+       class="tiny"
+       x="365"
+       y="334"
+       id="text104">Word: Título 1 → OSER: heading level 1</text>
+    <text
+       class="tiny"
+       x="365"
+       y="358"
+       id="text106">Word: Cita destacada → OSER: blockquote.callout</text>
+    <text
+       class="tiny"
+       x="365"
+       y="382"
+       id="text108">Word: Imagen + pie → OSER: figure + caption</text>
+    <text
+       class="tiny"
+       x="365"
+       y="406"
+       id="text110">Word: Tabla compacta → OSER: table.compact</text>
+    <rect
+       class="chip-warn"
+       x="365"
+       y="428"
+       width="260"
+       height="25"
+       id="rect112" />
+    <text
+       class="tiny"
+       x="381"
+       y="445"
+       id="text114">⚠ 4 estilos requieren revisión</text>
+  </g>
+  <!-- Stage 2 -->
+  <g
+     transform="translate(1150,170)"
+     id="g220">
+    <text
+       class="stage-title"
+       x="0"
+       y="0"
+       id="text118">2 · Revisar estructura y diagnostics</text>
+    <rect
+       class="window"
+       x="0"
+       y="24"
+       width="980"
+       height="520"
+       id="rect120" />
+    <rect
+       class="bar"
+       x="0"
+       y="24"
+       width="980"
+       height="54"
+       id="rect122" />
+    <rect
+       class="bar-flat"
+       x="0"
+       y="52"
+       width="980"
+       height="26"
+       id="rect124" />
+    <circle
+       cx="28"
+       cy="51"
+       r="7"
+       fill="#ff6b6b"
+       id="circle126" />
+    <circle
+       cx="52"
+       cy="51"
+       r="7"
+       fill="#ffd166"
+       id="circle128" />
+    <circle
+       cx="76"
+       cy="51"
+       r="7"
+       fill="#06d6a0"
+       id="circle130" />
+    <text
+       class="small"
+       x="116"
+       y="56"
+       fill="#f2f2f2"
+       id="text132">Proyecto / Libro de prueba / Variante principal</text>
+    <rect
+       class="tab"
+       x="704"
+       y="38"
+       width="74"
+       height="28"
+       id="rect134" />
+    <text
+       class="tiny"
+       x="720"
+       y="56"
+       fill="#eee"
+       id="text136">Import</text>
+    <rect
+       class="tab-on"
+       x="786"
+       y="38"
+       width="84"
+       height="28"
+       id="rect138" />
+    <text
+       class="tiny"
+       x="806"
+       y="56"
+       id="text140">Review</text>
+    <rect
+       class="tab"
+       x="878"
+       y="38"
+       width="74"
+       height="28"
+       id="rect142" />
+    <text
+       class="tiny"
+       x="895"
+       y="56"
+       fill="#eee"
+       id="text144">Design</text>
+    <rect
+       class="panel"
+       x="26"
+       y="102"
+       width="250"
+       height="410"
+       id="rect146" />
+    <text
+       class="label"
+       x="48"
+       y="132"
+       id="text148">Estructura</text>
+    <text
+       class="tiny"
+       x="52"
+       y="164"
+       id="text150">▾ Libro</text>
+    <text
+       class="tiny"
+       x="68"
+       y="190"
+       id="text152">01 · Introducción</text>
+    <text
+       class="tiny"
+       x="68"
+       y="214"
+       id="text154">02 · Marco teórico</text>
+    <text
+       class="tiny"
+       x="86"
+       y="238"
+       id="text156">2.1 · Imagen y texto</text>
+    <text
+       class="tiny"
+       x="86"
+       y="262"
+       id="text158">2.2 · Tablas</text>
+    <text
+       class="tiny"
+       x="68"
+       y="286"
+       id="text160">03 · Cierre</text>
+    <line
+       class="line"
+       x1="48"
+       y1="316"
+       x2="250"
+       y2="316"
+       id="line162" />
+    <text
+       class="small"
+       x="48"
+       y="346"
+       id="text164">Assets</text>
+    <text
+       class="tiny"
+       x="52"
+       y="374"
+       id="text166">18 imágenes</text>
+    <text
+       class="tiny"
+       x="52"
+       y="398"
+       id="text168">3 tablas</text>
+    <text
+       class="tiny"
+       x="52"
+       y="422"
+       id="text170">2 fuentes</text>
+    <rect
+       class="panel-alt"
+       x="306"
+       y="102"
+       width="390"
+       height="410"
+       id="rect172" />
+    <text
+       class="label"
+       x="334"
+       y="132"
+       id="text174">OserDocument</text>
+    <rect
+       x="334"
+       y="155"
+       width="334"
+       height="320"
+       rx="11"
+       fill="#111318"
+       id="rect176" />
+    <text
+       class="mono"
+       x="354"
+       y="184"
+       fill="#d7e3ff"
+       id="text178"
+       style="fill:#bebebe;fill-opacity:1">{</text>
+    <text
+       class="mono"
+       x="374"
+       y="210"
+       fill="#d7e3ff"
+       id="text180"
+       style="fill:#bebebe;fill-opacity:1">&quot;type&quot;: &quot;document&quot;,</text>
+    <text
+       class="mono"
+       x="374"
+       y="236"
+       fill="#d7e3ff"
+       id="text182"
+       style="fill:#bebebe;fill-opacity:1">&quot;metadata&quot;: { &quot;lang&quot;: &quot;es&quot; },</text>
+    <text
+       class="mono"
+       x="374"
+       y="262"
+       fill="#d7e3ff"
+       id="text184"
+       style="fill:#bebebe;fill-opacity:1">&quot;children&quot;: [</text>
+    <text
+       class="mono"
+       x="394"
+       y="288"
+       fill="#d7e3ff"
+       id="text186"
+       style="fill:#bebebe;fill-opacity:1">heading, paragraph, figure,</text>
+    <text
+       class="mono"
+       x="394"
+       y="314"
+       fill="#d7e3ff"
+       id="text188"
+       style="fill:#bebebe;fill-opacity:1">table, blockquote...</text>
+    <text
+       class="mono"
+       x="374"
+       y="340"
+       fill="#d7e3ff"
+       id="text190"
+       style="fill:#bebebe;fill-opacity:1">]</text>
+    <text
+       class="mono"
+       x="354"
+       y="366"
+       fill="#d7e3ff"
+       id="text192"
+       style="fill:#bebebe;fill-opacity:1">}</text>
+    <rect
+       class="panel"
+       x="726"
+       y="102"
+       width="228"
+       height="410"
+       id="rect194" />
+    <text
+       class="label"
+       x="748"
+       y="132"
+       id="text196">Diagnostics</text>
+    <rect
+       class="chip-green"
+       x="748"
+       y="156"
+       width="164"
+       height="28"
+       id="rect198" />
+    <text
+       class="tiny"
+       x="762"
+       y="174"
+       id="text200">✓ 0 errores</text>
+    <rect
+       class="chip-warn"
+       x="748"
+       y="194"
+       width="164"
+       height="28"
+       id="rect202" />
+    <text
+       class="tiny"
+       x="762"
+       y="212"
+       id="text204">⚠ 5 warnings</text>
+    <line
+       class="line"
+       x1="748"
+       y1="244"
+       x2="928"
+       y2="244"
+       id="line206" />
+    <text
+       class="tiny"
+       x="748"
+       y="270"
+       id="text208">• Imagen sin alt</text>
+    <text
+       class="tiny"
+       x="748"
+       y="296"
+       id="text210">• H1 → H3 sospechoso</text>
+    <text
+       class="tiny"
+       x="748"
+       y="322"
+       id="text212">• Tabla ancha</text>
+    <text
+       class="tiny"
+       x="748"
+       y="348"
+       id="text214">• Ruta asset relativa</text>
+    <rect
+       class="btn2"
+       x="748"
+       y="410"
+       width="150"
+       height="34"
+       id="rect216" />
+    <text
+       class="tiny"
+       x="774"
+       y="432"
+       id="text218">Resolver después</text>
+  </g>
+  <!-- Stage 3 -->
+  <g
+     transform="translate(70,780)"
+     id="g366">
+    <text
+       class="stage-title"
+       x="0"
+       y="0"
+       id="text222">3 · Diseñar con reglas, páginas maestras y preview paginado</text>
+    <rect
+       class="window"
+       x="0"
+       y="24"
+       width="980"
+       height="560"
+       id="rect224" />
+    <rect
+       class="bar"
+       x="0"
+       y="24"
+       width="980"
+       height="54"
+       id="rect226" />
+    <rect
+       class="bar-flat"
+       x="0"
+       y="52"
+       width="980"
+       height="26"
+       id="rect228" />
+    <circle
+       cx="28"
+       cy="51"
+       r="7"
+       fill="#ff6b6b"
+       id="circle230" />
+    <circle
+       cx="52"
+       cy="51"
+       r="7"
+       fill="#ffd166"
+       id="circle232" />
+    <circle
+       cx="76"
+       cy="51"
+       r="7"
+       fill="#06d6a0"
+       id="circle234" />
+    <text
+       class="small"
+       x="116"
+       y="56"
+       fill="#f2f2f2"
+       id="text236">Diseño / Classic Book / Carta / Español</text>
+    <rect
+       class="tab"
+       x="626"
+       y="38"
+       width="78"
+       height="28"
+       id="rect238" />
+    <text
+       class="tiny"
+       x="644"
+       y="56"
+       fill="#eee"
+       id="text240">Review</text>
+    <rect
+       class="tab-on"
+       x="712"
+       y="38"
+       width="80"
+       height="28"
+       id="rect242" />
+    <text
+       class="tiny"
+       x="731"
+       y="56"
+       id="text244">Design</text>
+    <rect
+       class="tab"
+       x="800"
+       y="38"
+       width="78"
+       height="28"
+       id="rect246" />
+    <text
+       class="tiny"
+       x="820"
+       y="56"
+       fill="#eee"
+       id="text248">Export</text>
+    <rect
+       class="tab"
+       x="886"
+       y="38"
+       width="68"
+       height="28"
+       id="rect250" />
+    <text
+       class="tiny"
+       x="904"
+       y="56"
+       fill="#eee"
+       id="text252">Git</text>
+    <rect
+       class="panel"
+       x="24"
+       y="100"
+       width="220"
+       height="452"
+       id="rect254" />
+    <text
+       class="label"
+       x="46"
+       y="130"
+       id="text256">LayoutProfile</text>
+    <text
+       class="tiny"
+       x="46"
+       y="158"
+       id="text258">Preset: Classic Book</text>
+    <text
+       class="tiny"
+       x="46"
+       y="182"
+       id="text260">Formato: Letter</text>
+    <text
+       class="tiny"
+       x="46"
+       y="206"
+       id="text262">Márgenes: espejo</text>
+    <text
+       class="tiny"
+       x="46"
+       y="230"
+       id="text264">Columnas: 1</text>
+    <line
+       class="line"
+       x1="46"
+       y1="258"
+       x2="220"
+       y2="258"
+       id="line266" />
+    <text
+       class="small"
+       x="46"
+       y="286"
+       id="text268">Páginas maestras</text>
+    <text
+       class="tiny"
+       x="54"
+       y="314"
+       id="text270">A · Capítulo</text>
+    <text
+       class="tiny"
+       x="54"
+       y="338"
+       id="text272">B · Imagen grande</text>
+    <text
+       class="tiny"
+       x="54"
+       y="362"
+       id="text274">C · Tabla</text>
+    <line
+       class="line"
+       x1="46"
+       y1="390"
+       x2="220"
+       y2="390"
+       id="line276" />
+    <text
+       class="small"
+       x="46"
+       y="418"
+       id="text278">Versiones</text>
+    <text
+       class="tiny"
+       x="54"
+       y="446"
+       id="text280">Principal</text>
+    <text
+       class="tiny"
+       x="54"
+       y="470"
+       id="text282">Compacta</text>
+    <text
+       class="tiny"
+       x="54"
+       y="494"
+       id="text284">A5 experimental</text>
+    <rect
+       class="panel-alt"
+       x="270"
+       y="100"
+       width="450"
+       height="452"
+       id="rect286" />
+    <text
+       class="label"
+       x="298"
+       y="130"
+       id="text288">Preview paginado</text>
+    <rect
+       class="page-shadow"
+       x="330"
+       y="178"
+       width="140"
+       height="195"
+       id="rect290" />
+    <rect
+       class="page"
+       x="322"
+       y="168"
+       width="140"
+       height="195"
+       id="rect292" />
+    <line
+       class="line"
+       x1="345"
+       y1="206"
+       x2="437"
+       y2="206"
+       id="line294" />
+    <line
+       class="line"
+       x1="345"
+       y1="224"
+       x2="437"
+       y2="224"
+       id="line296" />
+    <line
+       class="line"
+       x1="345"
+       y1="242"
+       x2="428"
+       y2="242"
+       id="line298" />
+    <rect
+       x="345"
+       y="268"
+       width="92"
+       height="46"
+       fill="#e6e6e6"
+       stroke="#bbb"
+       id="rect300" />
+    <line
+       class="line"
+       x1="345"
+       y1="332"
+       x2="437"
+       y2="332"
+       id="line302" />
+    <text
+       class="tiny"
+       x="373"
+       y="388"
+       id="text304">Página 1</text>
+    <rect
+       class="page-shadow"
+       x="526"
+       y="178"
+       width="140"
+       height="195"
+       id="rect306" />
+    <rect
+       class="page"
+       x="518"
+       y="168"
+       width="140"
+       height="195"
+       id="rect308" />
+    <line
+       class="line"
+       x1="541"
+       y1="206"
+       x2="633"
+       y2="206"
+       id="line310" />
+    <line
+       class="line"
+       x1="541"
+       y1="224"
+       x2="633"
+       y2="224"
+       id="line312" />
+    <line
+       class="line"
+       x1="541"
+       y1="242"
+       x2="624"
+       y2="242"
+       id="line314" />
+    <line
+       class="line"
+       x1="541"
+       y1="260"
+       x2="633"
+       y2="260"
+       id="line316" />
+    <rect
+       x="541"
+       y="290"
+       width="92"
+       height="42"
+       fill="#fff4cc"
+       stroke="#d6b24a"
+       id="rect318" />
+    <text
+       class="tiny"
+       x="569"
+       y="388"
+       id="text320">Página 2</text>
+    <rect
+       class="chip-warn"
+       x="315"
+       y="420"
+       width="340"
+       height="31"
+       id="rect322" />
+    <text
+       class="tiny"
+       x="335"
+       y="440"
+       id="text324">⚠ Tabla cercana a corte de página</text>
+    <rect
+       class="btn2"
+       x="315"
+       y="466"
+       width="130"
+       height="34"
+       id="rect326" />
+    <text
+       class="tiny"
+       x="344"
+       y="488"
+       id="text328">Ajustar regla</text>
+    <rect
+       class="btn"
+       x="460"
+       y="466"
+       width="130"
+       height="34"
+       id="rect330" />
+    <text
+       class="tiny"
+       x="489"
+       y="488"
+       fill="#fff"
+       id="text332">Checkpoint</text>
+    <rect
+       class="panel"
+       x="746"
+       y="100"
+       width="210"
+       height="452"
+       id="rect334" />
+    <text
+       class="label"
+       x="768"
+       y="130"
+       id="text336">Inspector</text>
+    <text
+       class="tiny"
+       x="768"
+       y="160"
+       id="text338">Elemento: table</text>
+    <text
+       class="tiny"
+       x="768"
+       y="184"
+       id="text340">Regla: avoid-break</text>
+    <line
+       class="line"
+       x1="768"
+       y1="210"
+       x2="930"
+       y2="210"
+       id="line342" />
+    <text
+       class="small"
+       x="768"
+       y="238"
+       id="text344">Override local</text>
+    <rect
+       class="chip"
+       x="768"
+       y="260"
+       width="142"
+       height="27"
+       id="rect346" />
+    <text
+       class="tiny"
+       x="782"
+       y="278"
+       id="text348">move to next page</text>
+    <rect
+       class="chip"
+       x="768"
+       y="294"
+       width="142"
+       height="27"
+       id="rect350" />
+    <text
+       class="tiny"
+       x="782"
+       y="312"
+       id="text352">keep with heading</text>
+    <rect
+       class="chip-warn"
+       x="768"
+       y="328"
+       width="142"
+       height="27"
+       id="rect354" />
+    <text
+       class="tiny"
+       x="782"
+       y="346"
+       id="text356">allow break</text>
+    <line
+       class="line"
+       x1="768"
+       y1="380"
+       x2="930"
+       y2="380"
+       id="line358" />
+    <text
+       class="small"
+       x="768"
+       y="408"
+       id="text360">AI assistant</text>
+    <text
+       class="tiny"
+       x="768"
+       y="434"
+       id="text362">“Reducir a 8 páginas”</text>
+    <text
+       class="tiny"
+       x="768"
+       y="458"
+       id="text364">“Hacerlo más académico”</text>
+  </g>
+  <!-- Stage 4 -->
+  <g
+     transform="translate(1150,780)"
+     id="g490">
+    <text
+       class="stage-title"
+       x="0"
+       y="0"
+       id="text368">4 · Exportar, versionar y publicar variantes</text>
+    <rect
+       class="window"
+       x="0"
+       y="24"
+       width="980"
+       height="560"
+       id="rect370" />
+    <rect
+       class="bar"
+       x="0"
+       y="24"
+       width="980"
+       height="54"
+       id="rect372" />
+    <rect
+       class="bar-flat"
+       x="0"
+       y="52"
+       width="980"
+       height="26"
+       id="rect374" />
+    <circle
+       cx="28"
+       cy="51"
+       r="7"
+       fill="#ff6b6b"
+       id="circle376" />
+    <circle
+       cx="52"
+       cy="51"
+       r="7"
+       fill="#ffd166"
+       id="circle378" />
+    <circle
+       cx="76"
+       cy="51"
+       r="7"
+       fill="#06d6a0"
+       id="circle380" />
+    <text
+       class="small"
+       x="116"
+       y="56"
+       fill="#f2f2f2"
+       id="text382">Export / Publicación 1.0 / Variantes</text>
+    <rect
+       class="tab"
+       x="626"
+       y="38"
+       width="78"
+       height="28"
+       id="rect384" />
+    <text
+       class="tiny"
+       x="646"
+       y="56"
+       fill="#eee"
+       id="text386">Design</text>
+    <rect
+       class="tab-on"
+       x="712"
+       y="38"
+       width="80"
+       height="28"
+       id="rect388" />
+    <text
+       class="tiny"
+       x="731"
+       y="56"
+       id="text390">Export</text>
+    <rect
+       class="tab"
+       x="800"
+       y="38"
+       width="78"
+       height="28"
+       id="rect392" />
+    <text
+       class="tiny"
+       x="823"
+       y="56"
+       fill="#eee"
+       id="text394">Git</text>
+    <rect
+       class="tab"
+       x="886"
+       y="38"
+       width="68"
+       height="28"
+       id="rect396" />
+    <text
+       class="tiny"
+       x="899"
+       y="56"
+       fill="#eee"
+       id="text398">Series</text>
+    <rect
+       class="panel"
+       x="24"
+       y="100"
+       width="260"
+       height="452"
+       id="rect400" />
+    <text
+       class="label"
+       x="48"
+       y="130"
+       id="text402">Checkpoints</text>
+    <rect
+       class="chip-green"
+       x="48"
+       y="154"
+       width="190"
+       height="28"
+       id="rect404" />
+    <text
+       class="tiny"
+       x="64"
+       y="172"
+       id="text406">✓ Diseño base aprobado</text>
+    <rect
+       class="chip"
+       x="48"
+       y="190"
+       width="190"
+       height="28"
+       id="rect408" />
+    <text
+       class="tiny"
+       x="64"
+       y="208"
+       id="text410">Variante: A5</text>
+    <rect
+       class="chip"
+       x="48"
+       y="226"
+       width="190"
+       height="28"
+       id="rect412" />
+    <text
+       class="tiny"
+       x="64"
+       y="244"
+       id="text414">Variante: English</text>
+    <rect
+       class="chip-warn"
+       x="48"
+       y="262"
+       width="190"
+       height="28"
+       id="rect416" />
+    <text
+       class="tiny"
+       x="64"
+       y="280"
+       id="text418">Experimento: errores</text>
+    <line
+       class="line"
+       x1="48"
+       y1="318"
+       x2="240"
+       y2="318"
+       id="line420" />
+    <text
+       class="small"
+       x="48"
+       y="348"
+       id="text422">Git traducido</text>
+    <text
+       class="tiny"
+       x="48"
+       y="374"
+       id="text424">commit → checkpoint</text>
+    <text
+       class="tiny"
+       x="48"
+       y="398"
+       id="text426">branch → variant</text>
+    <text
+       class="tiny"
+       x="48"
+       y="422"
+       id="text428">diff → compare</text>
+    <text
+       class="tiny"
+       x="48"
+       y="446"
+       id="text430">tag → publication</text>
+    <rect
+       class="panel-alt"
+       x="314"
+       y="100"
+       width="350"
+       height="452"
+       id="rect432" />
+    <text
+       class="label"
+       x="342"
+       y="130"
+       id="text434">Export targets</text>
+    <rect
+       class="chip-green"
+       x="342"
+       y="158"
+       width="220"
+       height="32"
+       id="rect436" />
+    <text
+       class="tiny"
+       x="360"
+       y="179"
+       id="text438">PDF imprenta · Letter</text>
+    <rect
+       class="chip-green"
+       x="342"
+       y="202"
+       width="220"
+       height="32"
+       id="rect440" />
+    <text
+       class="tiny"
+       x="360"
+       y="223"
+       id="text442">PDF digital · A5</text>
+    <rect
+       class="chip"
+       x="342"
+       y="246"
+       width="220"
+       height="32"
+       id="rect444" />
+    <text
+       class="tiny"
+       x="360"
+       y="267"
+       id="text446">EPUB reflowable</text>
+    <rect
+       class="chip"
+       x="342"
+       y="290"
+       width="220"
+       height="32"
+       id="rect448" />
+    <text
+       class="tiny"
+       x="360"
+       y="311"
+       id="text450">HTML microsite</text>
+    <rect
+       class="chip"
+       x="342"
+       y="334"
+       width="220"
+       height="32"
+       id="rect452" />
+    <text
+       class="tiny"
+       x="360"
+       y="355"
+       id="text454">Archive package</text>
+    <rect
+       class="btn"
+       x="342"
+       y="414"
+       width="145"
+       height="38"
+       id="rect456" />
+    <text
+       class="tiny"
+       x="376"
+       y="438"
+       fill="#fff"
+       id="text458">Exportar todo</text>
+    <rect
+       class="btn2"
+       x="500"
+       y="414"
+       width="118"
+       height="38"
+       id="rect460" />
+    <text
+       class="tiny"
+       x="528"
+       y="438"
+       id="text462">Preview</text>
+    <rect
+       class="panel"
+       x="696"
+       y="100"
+       width="260"
+       height="452"
+       id="rect464" />
+    <text
+       class="label"
+       x="718"
+       y="130"
+       id="text466">Serie editorial</text>
+    <text
+       class="tiny"
+       x="718"
+       y="160"
+       id="text468">Base: Colección Ensayos</text>
+    <text
+       class="tiny"
+       x="718"
+       y="184"
+       id="text470">Hereda: tipografía, folios</text>
+    <text
+       class="tiny"
+       x="718"
+       y="208"
+       id="text472">Override: idioma, formato</text>
+    <line
+       class="line"
+       x1="718"
+       y1="238"
+       x2="930"
+       y2="238"
+       id="line474" />
+    <text
+       class="small"
+       x="718"
+       y="266"
+       id="text476">Outputs</text>
+    <text
+       class="tiny"
+       x="718"
+       y="296"
+       id="text478">/publications/es/letter.pdf</text>
+    <text
+       class="tiny"
+       x="718"
+       y="320"
+       id="text480">/publications/en/letter.pdf</text>
+    <text
+       class="tiny"
+       x="718"
+       y="344"
+       id="text482">/publications/es/epub/</text>
+    <text
+       class="tiny"
+       x="718"
+       y="368"
+       id="text484">/publications/web/</text>
+    <rect
+       class="chip-green"
+       x="718"
+       y="418"
+       width="160"
+       height="29"
+       id="rect486" />
+    <text
+       class="tiny"
+       x="736"
+       y="437"
+       id="text488">✓ Ready to publish</text>
+  </g>
+  <path
+     class="arrow"
+     d="M1050 440 L1150 440"
+     id="path492" />
+  <path
+     class="arrow"
+     d="M560 725 L560 780"
+     id="path494" />
+  <path
+     class="arrow"
+     d="M1050 1060 L1150 1060"
+     id="path496" />
+  <path
+     class="soft-arrow"
+     d="M1640 1340 C1580 1410 640 1410 545 1340"
+     id="path498" />
+  <text
+     class="small"
+     x="830"
+     y="1390"
+     id="text500">Loop real: exportar → revisar → ajustar reglas/overrides → checkpoint → publicar variante</text>
+</svg>

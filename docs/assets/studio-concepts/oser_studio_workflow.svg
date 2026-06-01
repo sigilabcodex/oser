@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1250" viewBox="0 0 1800 1250">
+  <defs>
+    <style>
+      .bg { fill: #f7f3ea; }
+      .title { font-family: Inter, DejaVu Sans, Arial, sans-serif; font-size: 46px; font-weight: 800; fill: #202020; }
+      .subtitle { font-family: Inter, DejaVu Sans, Arial, sans-serif; font-size: 22px; fill: #555; }
+      .section { font-family: Inter, DejaVu Sans, Arial, sans-serif; font-size: 22px; font-weight: 800; fill: #222; }
+      .label { font-family: Inter, DejaVu Sans, Arial, sans-serif; font-size: 21px; font-weight: 700; fill: #202020; }
+      .small { font-family: Inter, DejaVu Sans, Arial, sans-serif; font-size: 16px; fill: #444; }
+      .tiny { font-family: Inter, DejaVu Sans, Arial, sans-serif; font-size: 13px; fill: #555; }
+      .note { font-family: Inter, DejaVu Sans, Arial, sans-serif; font-size: 15px; fill: #333; }
+      .box { fill: #ffffff; stroke: #242424; stroke-width: 2.5; rx: 18; }
+      .soft { fill: #fffaf0; stroke: #242424; stroke-width: 2; rx: 18; }
+      .blue { fill: #e9f1ff; stroke: #242424; stroke-width: 2.5; rx: 18; }
+      .green { fill: #eaf7ee; stroke: #242424; stroke-width: 2.5; rx: 18; }
+      .yellow { fill: #fff4cc; stroke: #242424; stroke-width: 2.5; rx: 18; }
+      .pink { fill: #ffe8eb; stroke: #242424; stroke-width: 2.5; rx: 18; }
+      .purple { fill: #f0e9ff; stroke: #242424; stroke-width: 2.5; rx: 18; }
+      .gray { fill: #eeeeee; stroke: #242424; stroke-width: 2.5; rx: 18; }
+      .dash { fill: #ffffff; stroke: #242424; stroke-width: 2; stroke-dasharray: 7 7; rx: 18; }
+      .arrow { stroke: #222; stroke-width: 3; fill: none; marker-end: url(#arrowhead); }
+      .thin { stroke: #555; stroke-width: 2; fill: none; marker-end: url(#arrowheadSmall); }
+      .feedback { stroke: #8a5a00; stroke-width: 3; fill: none; marker-end: url(#arrowheadWarm); stroke-dasharray: 9 7; }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto">
+      <polygon points="0 0, 12 4, 0 8" fill="#222"/>
+    </marker>
+    <marker id="arrowheadSmall" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#555"/>
+    </marker>
+    <marker id="arrowheadWarm" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto">
+      <polygon points="0 0, 12 4, 0 8" fill="#8a5a00"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1800" height="1250"/>
+  <text class="title" x="70" y="75">OSER Studio — flujo editorial declarativo</text>
+  <text class="subtitle" x="72" y="112">De archivos comunes a publicaciones multiformato, con reglas algorítmicas, revisión visual y control humano.</text>
+
+  <!-- Top workflow lanes -->
+  <rect class="soft" x="55" y="150" width="1690" height="930" rx="26"/>
+  <text class="section" x="90" y="190">1. Entrada e importación semántica</text>
+  <text class="section" x="90" y="370">2. Normalización: el documento como modelo editable</text>
+  <text class="section" x="90" y="565">3. Diseño editorial declarativo + intervención humana</text>
+  <text class="section" x="90" y="870">4. Publicación multiformato y multiversión</text>
+
+  <!-- Input files -->
+  <rect class="box" x="90" y="215" width="280" height="105"/>
+  <text class="label" x="120" y="250">Archivos fuente</text>
+  <text class="small" x="120" y="278">DOCX · RTF · TXT · MD</text>
+  <text class="small" x="120" y="302">ODT · HTML · otros</text>
+
+  <rect class="blue" x="430" y="215" width="310" height="105"/>
+  <text class="label" x="460" y="250">Import adapters</text>
+  <text class="small" x="460" y="278">Mammoth / Pandoc / LO</text>
+  <text class="small" x="460" y="302">TXT / Markdown nativo</text>
+
+  <rect class="yellow" x="800" y="215" width="330" height="105"/>
+  <text class="label" x="830" y="250">Semantic recovery</text>
+  <text class="small" x="830" y="278">títulos, párrafos, listas</text>
+  <text class="small" x="830" y="302">tablas, imágenes, notas</text>
+
+  <rect class="pink" x="1190" y="215" width="330" height="105"/>
+  <text class="label" x="1220" y="250">Import review</text>
+  <text class="small" x="1220" y="278">warnings, assets, estilos</text>
+  <text class="small" x="1220" y="302">mapeo revisable</text>
+
+  <path class="arrow" d="M370 267 L430 267"/>
+  <path class="arrow" d="M740 267 L800 267"/>
+  <path class="arrow" d="M1130 267 L1190 267"/>
+
+  <!-- Document model -->
+  <rect class="green" x="90" y="400" width="370" height="120"/>
+  <text class="label" x="120" y="435">OserDocument</text>
+  <text class="small" x="120" y="464">modelo estructural común</text>
+  <text class="small" x="120" y="488">bloques, inlines, metadata</text>
+
+  <rect class="green" x="520" y="400" width="370" height="120"/>
+  <text class="label" x="550" y="435">Diagnostics</text>
+  <text class="small" x="550" y="464">errores, warnings, info</text>
+  <text class="small" x="550" y="488">problemas accionables</text>
+
+  <rect class="green" x="950" y="400" width="370" height="120"/>
+  <text class="label" x="980" y="435">Assets</text>
+  <text class="small" x="980" y="464">imágenes, gráficos, fuentes</text>
+  <text class="small" x="980" y="488">rutas y dependencias</text>
+
+  <rect class="gray" x="1380" y="400" width="310" height="120"/>
+  <text class="label" x="1410" y="435">Git-native state</text>
+  <text class="small" x="1410" y="464">checkpoints, variants</text>
+  <text class="small" x="1410" y="488">compare, restore, publish</text>
+
+  <path class="arrow" d="M1355 320 C1355 365 275 360 275 400"/>
+  <path class="thin" d="M460 460 L520 460"/>
+  <path class="thin" d="M890 460 L950 460"/>
+  <path class="thin" d="M1320 460 L1380 460"/>
+
+  <!-- Design / studio -->
+  <rect class="purple" x="90" y="595" width="330" height="210"/>
+  <text class="label" x="120" y="630">LayoutProfile</text>
+  <text class="small" x="120" y="660">tamaño, márgenes</text>
+  <text class="small" x="120" y="684">tipografía, escala</text>
+  <text class="small" x="120" y="708">columnas, reglas</text>
+  <text class="small" x="120" y="732">figuras y tablas</text>
+  <text class="tiny" x="120" y="765">editable por GUI o IA</text>
+
+  <rect class="purple" x="470" y="595" width="330" height="210"/>
+  <text class="label" x="500" y="630">Master pages</text>
+  <text class="small" x="500" y="660">retículas, headers</text>
+  <text class="small" x="500" y="684">folios, secciones</text>
+  <text class="small" x="500" y="708">series e idiomas</text>
+  <text class="small" x="500" y="732">formatos heredados</text>
+  <text class="tiny" x="500" y="765">libro, reporte, folleto</text>
+
+  <rect class="purple" x="850" y="595" width="330" height="210"/>
+  <text class="label" x="880" y="630">Preview paginado</text>
+  <text class="small" x="880" y="660">HTML print / PDF preview</text>
+  <text class="small" x="880" y="684">zoom, páginas, cortes</text>
+  <text class="small" x="880" y="708">inspector de elementos</text>
+  <text class="small" x="880" y="732">diagnostics visuales</text>
+  <text class="tiny" x="880" y="765">WYSIWYG-ish, no canvas libre</text>
+
+  <rect class="purple" x="1230" y="595" width="330" height="210"/>
+  <text class="label" x="1260" y="630">Manual overrides</text>
+  <text class="small" x="1260" y="660">ajustes finos por caso</text>
+  <text class="small" x="1260" y="684">correcciones y excepciones</text>
+  <text class="small" x="1260" y="708">errores intencionales</text>
+  <text class="small" x="1260" y="732">respeto al diseñador</text>
+  <text class="tiny" x="1260" y="765">registrados como cambios</text>
+
+  <path class="thin" d="M460 520 C360 550 255 560 255 595"/>
+  <path class="thin" d="M690 520 C690 555 635 560 635 595"/>
+  <path class="thin" d="M1135 520 C1110 555 1015 560 1015 595"/>
+  <path class="thin" d="M1535 520 C1500 555 1395 560 1395 595"/>
+  <path class="arrow" d="M420 700 L470 700"/>
+  <path class="arrow" d="M800 700 L850 700"/>
+  <path class="arrow" d="M1180 700 L1230 700"/>
+
+  <!-- feedback loop -->
+  <path class="feedback" d="M1395 805 C1395 842 1015 842 1015 805"/>
+  <text class="note" x="1060" y="840">iterar: reglas → preview → ajuste → checkpoint</text>
+
+  <!-- outputs -->
+  <rect class="yellow" x="90" y="900" width="275" height="120"/>
+  <text class="label" x="120" y="936">PDF print-ready</text>
+  <text class="small" x="120" y="965">imprenta, folios</text>
+  <text class="small" x="120" y="989">formatos físicos</text>
+
+  <rect class="yellow" x="415" y="900" width="275" height="120"/>
+  <text class="label" x="445" y="936">EPUB</text>
+  <text class="small" x="445" y="965">reflowable / fixed</text>
+  <text class="small" x="445" y="989">lectores digitales</text>
+
+  <rect class="yellow" x="740" y="900" width="275" height="120"/>
+  <text class="label" x="770" y="936">HTML / Microsite</text>
+  <text class="small" x="770" y="965">artículo, instructivo</text>
+  <text class="small" x="770" y="989">web publication</text>
+
+  <rect class="yellow" x="1065" y="900" width="275" height="120"/>
+  <text class="label" x="1095" y="936">Series / idiomas</text>
+  <text class="small" x="1095" y="965">herencia de perfiles</text>
+  <text class="small" x="1095" y="989">variantes localizadas</text>
+
+  <rect class="yellow" x="1390" y="900" width="275" height="120"/>
+  <text class="label" x="1420" y="936">Archive package</text>
+  <text class="small" x="1420" y="965">fuentes, assets</text>
+  <text class="small" x="1420" y="989">metadata, historial</text>
+
+  <path class="arrow" d="M255 805 L230 900"/>
+  <path class="arrow" d="M635 805 L553 900"/>
+  <path class="arrow" d="M1015 805 L878 900"/>
+  <path class="arrow" d="M1395 805 L1203 900"/>
+  <path class="arrow" d="M1395 805 C1510 835 1530 870 1530 900"/>
+
+  <!-- bottom summary -->
+  <rect class="dash" x="85" y="1110" width="1640" height="90"/>
+  <text class="label" x="120" y="1145">Principio central</text>
+  <text class="small" x="120" y="1175">La máquina aplica reglas; el diseñador define, revisa, rompe y versiona esas reglas. El output es reproducible, editable y publicable.</text>
+</svg>
