@@ -4,6 +4,17 @@ export type StudioDocument = {
   format: "markdown" | "txt" | "unknown";
 };
 
+export type StudioDocumentSummary = {
+  id: string;
+  name: string;
+  path: string;
+  format: "markdown" | "txt" | "unknown";
+};
+
+export type StudioDocumentListResponse = {
+  documents: StudioDocumentSummary[];
+};
+
 export type StudioProfile = {
   id: string;
   name: string;

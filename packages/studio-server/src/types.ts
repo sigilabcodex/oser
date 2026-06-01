@@ -12,6 +12,17 @@ export type StudioDocumentResponse = {
   format: StudioSourceFormat;
 };
 
+export type StudioDocumentSummary = {
+  id: string;
+  name: string;
+  path: string;
+  format: StudioSourceFormat;
+};
+
+export type StudioDocumentListResponse = {
+  documents: StudioDocumentSummary[];
+};
+
 export type StudioProfile = {
   id: string;
   name: string;

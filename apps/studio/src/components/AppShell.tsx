@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { exportPdf, fetchDocument, fetchProfiles, renderHtml, validateDocument } from "../api";
-import type { DiagnosticsPayload, RenderManifest, StudioDocument, StudioProfile } from "../types";
+import { exportPdf, fetchDocument, fetchDocuments, fetchProfiles, renderHtml, validateDocument } from "../api";
+import type {
+  DiagnosticsPayload,
+  RenderManifest,
+  StudioDocument,
+  StudioDocumentSummary,
+  StudioProfile
+} from "../types";
 import { DiagnosticsPanel } from "./DiagnosticsPanel";
 import { ExportPanel } from "./ExportPanel";
 import { PreviewPanel } from "./PreviewPanel";
@@ -11,6 +17,8 @@ type ActionState = "idle" | "loading";
 
 export function AppShell() {
   const [document, setDocument] = useState<StudioDocument | null>(null);
+  const [documents, setDocuments] = useState<StudioDocumentSummary[]>([]);
+  const [selectedSourcePath, setSelectedSourcePath] = useState<string>("");
   const [profiles, setProfiles] = useState<StudioProfile[]>([]);
   const [selectedProfilePath, setSelectedProfilePath] = useState<string>("");
   const [diagnostics, setDiagnostics] = useState<DiagnosticsPayload | null>(null);
@@ -28,11 +36,15 @@ export function AppShell() {
       setActionState("loading");
       setError(null);
       try {
-        const [loadedDocument, loadedProfiles] = await Promise.all([fetchDocument(), fetchProfiles()]);
+        const [loadedDocuments, loadedProfiles] = await Promise.all([fetchDocuments(), fetchProfiles()]);
+        const initialSourcePath = loadedDocuments[0]?.path;
+        const loadedDocument = await fetchDocument(initialSourcePath);
         if (cancelled) {
           return;
         }
+        setDocuments(loadedDocuments);
         setDocument(loadedDocument);
+        setSelectedSourcePath(loadedDocument.sourcePath);
         setProfiles(loadedProfiles);
         setSelectedProfilePath(loadedProfiles[0]?.path ?? "");
       } catch (loadError) {
@@ -57,6 +69,24 @@ export function AppShell() {
     () => profiles.find((profile) => profile.path === selectedProfilePath),
     [profiles, selectedProfilePath]
   );
+
+  function clearDocumentOutputs() {
+    setDiagnostics(null);
+    setHtmlManifest(null);
+    setPdfManifest(null);
+    setPreviewUrl(undefined);
+    setPdfUrl(undefined);
+  }
+
+  async function selectDocument(sourcePath: string) {
+    setSelectedSourcePath(sourcePath);
+    clearDocumentOutputs();
+    await runAction(async () => {
+      const loadedDocument = await fetchDocument(sourcePath);
+      setDocument(loadedDocument);
+      setSelectedSourcePath(loadedDocument.sourcePath);
+    });
+  }
 
   async function runAction(action: () => Promise<void>) {
     setActionState("loading");
@@ -98,7 +128,13 @@ export function AppShell() {
       {error ? <div className="error-banner">{error}</div> : null}
 
       <section className="workspace">
-        <SourcePanel document={document} />
+        <SourcePanel
+          document={document}
+          documents={documents}
+          selectedSourcePath={selectedSourcePath}
+          busy={isBusy}
+          onSelectDocument={selectDocument}
+        />
         <PreviewPanel previewUrl={previewUrl} manifest={htmlManifest} />
         <aside className="side-rail">
           <ProfilePanel

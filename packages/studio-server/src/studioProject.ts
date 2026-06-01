@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { extname, normalize, resolve } from "node:path";
-import type { StudioProfile, StudioSourceFormat } from "./types";
+import type { StudioDocumentSummary, StudioProfile, StudioSourceFormat } from "./types";
 
 export const studioHost = "127.0.0.1";
 export const studioPort = 4317;
@@ -15,10 +15,33 @@ export const studioExportHtmlPath = "dist/studio/export.html";
 export const studioExportManifestPath = "dist/studio/export.manifest.json";
 export const studioDiagnosticsPath = "dist/studio/diagnostics.json";
 
-const allowedSources = new Map<string, string>([
-  ["editorial-sample", "examples/editorial-sample.md"],
-  ["examples/editorial-sample.md", "examples/editorial-sample.md"]
-]);
+const allowedSourceDocuments: StudioDocumentSummary[] = [
+  {
+    id: "editorial-sample",
+    name: "Editorial sample",
+    path: "examples/editorial-sample.md",
+    format: "markdown"
+  },
+  {
+    id: "bad-heading-hierarchy",
+    name: "Bad heading hierarchy",
+    path: "stress-tests/cases/bad-heading-hierarchy.md",
+    format: "markdown"
+  },
+  {
+    id: "wide-table",
+    name: "Wide table",
+    path: "stress-tests/cases/wide-table.md",
+    format: "markdown"
+  }
+];
+
+const allowedSources = new Map<string, string>(
+  allowedSourceDocuments.flatMap((document) => [
+    [document.id, document.path],
+    [document.path, document.path]
+  ])
+);
 
 const allowedProfiles = new Map<string, string>([
   ["classic-book", "examples/profiles/classic-book.json"],
@@ -38,6 +61,10 @@ const allowedServedFiles = new Map<string, string>([
 
 export function defaultSourcePath(): string {
   return "examples/editorial-sample.md";
+}
+
+export function listDocuments(): StudioDocumentSummary[] {
+  return allowedSourceDocuments;
 }
 
 export function resolveAllowedSourcePath(sourcePath?: string): string {

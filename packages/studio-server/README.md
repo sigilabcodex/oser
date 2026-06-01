@@ -20,9 +20,16 @@ http://127.0.0.1:4317
 
 ## Fixed MVP Inputs
 
-The server intentionally uses a closed allowlist:
+The server intentionally uses a closed allowlist.
+
+Allowed source documents:
 
 - `examples/editorial-sample.md`
+- `stress-tests/cases/bad-heading-hierarchy.md`
+- `stress-tests/cases/wide-table.md`
+
+Allowed layout profiles:
+
 - `examples/profiles/classic-book.json`
 - `examples/profiles/report.json`
 
@@ -31,7 +38,8 @@ Generated files are written under `dist/studio/`.
 ## Endpoints
 
 ```text
-GET  /api/studio/document
+GET  /api/studio/documents
+GET  /api/studio/document?sourcePath=...
 GET  /api/studio/profiles
 POST /api/studio/validate
 POST /api/studio/render-html
@@ -40,9 +48,13 @@ GET  /preview/preview.html
 GET  /outputs/export.pdf
 ```
 
-### `GET /api/studio/document`
+### `GET /api/studio/documents`
 
-Returns the fixed source document:
+Returns the allowlisted source documents Studio can request.
+
+### `GET /api/studio/document?sourcePath=...`
+
+Returns an allowlisted source document. If `sourcePath` is omitted, the editorial sample is used.
 
 ```json
 {
@@ -58,7 +70,7 @@ Returns the allowlisted layout profiles from `examples/profiles/`.
 
 ### `POST /api/studio/validate`
 
-Runs OSER diagnostics on the fixed document or an allowlisted `sourcePath`.
+Runs OSER diagnostics on an allowlisted `sourcePath`.
 
 Example:
 
@@ -118,7 +130,8 @@ The server does not expose a general filesystem browser. The MVP copies `example
 With `npm run studio:server` running in one shell:
 
 ```sh
-curl http://127.0.0.1:4317/api/studio/document
+curl http://127.0.0.1:4317/api/studio/documents
+curl 'http://127.0.0.1:4317/api/studio/document?sourcePath=stress-tests%2Fcases%2Fwide-table.md'
 curl http://127.0.0.1:4317/api/studio/profiles
 curl -X POST http://127.0.0.1:4317/api/studio/validate \
   -H 'content-type: application/json' \
@@ -140,7 +153,7 @@ Render endpoints request manifest generation through reusable Core APIs and then
 ## Limitations
 
 - The server is local and experimental.
-- Only the fixed MVP document and two fixture profiles are allowed.
+- Only the allowlisted MVP documents and two fixture profiles are allowed.
 - There is no GUI, no file picker, no project persistence, and no live editing yet.
 - The PDF endpoint requires the existing Playwright setup used by `packages/pdf-renderer`.
 - The HTTP surface currently has no dedicated automated tests. Manual smoke test:

@@ -3,12 +3,20 @@ import type {
   ProfileListResponse,
   RenderHtmlResponse,
   StudioDocument,
+  StudioDocumentListResponse,
+  StudioDocumentSummary,
   StudioProfile,
   ValidateResponse
 } from "./types";
 
-export async function fetchDocument(): Promise<StudioDocument> {
-  return requestJson<StudioDocument>("/api/studio/document");
+export async function fetchDocuments(): Promise<StudioDocumentSummary[]> {
+  const response = await requestJson<StudioDocumentListResponse>("/api/studio/documents");
+  return response.documents;
+}
+
+export async function fetchDocument(sourcePath?: string): Promise<StudioDocument> {
+  const query = sourcePath ? `?sourcePath=${encodeURIComponent(sourcePath)}` : "";
+  return requestJson<StudioDocument>(`/api/studio/document${query}`);
 }
 
 export async function fetchProfiles(): Promise<StudioProfile[]> {

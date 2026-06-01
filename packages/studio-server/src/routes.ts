@@ -8,7 +8,7 @@ import {
   renderStudioHtml,
   validateStudioDocument
 } from "./oserPipeline";
-import { listProfiles, resolveServedFilePath, StudioProjectError } from "./studioProject";
+import { listDocuments, listProfiles, resolveServedFilePath, StudioProjectError } from "./studioProject";
 import type { StudioErrorResponse } from "./types";
 
 const maxBodyBytes = 64 * 1024;
@@ -24,8 +24,13 @@ export async function handleStudioRequest(request: IncomingMessage, response: Se
       return;
     }
 
+    if (method === "GET" && url.pathname === "/api/studio/documents") {
+      sendJson(response, 200, { documents: listDocuments() });
+      return;
+    }
+
     if (method === "GET" && url.pathname === "/api/studio/document") {
-      sendJson(response, 200, await getStudioDocument());
+      sendJson(response, 200, await getStudioDocument(url.searchParams.get("sourcePath") ?? undefined));
       return;
     }
 
