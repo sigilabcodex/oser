@@ -37,6 +37,12 @@ const allowedSourceDocuments: StudioDocumentSummary[] = [
     name: "Wide table",
     path: "stress-tests/cases/wide-table.md",
     format: "markdown"
+  },
+  {
+    id: "oser-editorial-stress-sample",
+    name: "OSER Editorial Stress Sample",
+    path: "stress-tests/cases/oser-editorial-stress-sample.md",
+    format: "markdown"
   }
 ];
 
