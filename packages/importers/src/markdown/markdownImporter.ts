@@ -57,7 +57,9 @@ export async function importMarkdown(
     });
   }
 
-  const tokens = markdown.parse(value.replace(/^\uFEFF/, ""), {});
+  const sourceValue = value.replace(/^\uFEFF/, "");
+  const frontmatter = extractFrontmatter(sourceValue);
+  const tokens = markdown.parse(frontmatter.content, {});
   const context: ParseContext = { warnings, sourceMap };
   const children = parseBlocks(tokens, 0, tokens.length, context, "/children");
 
@@ -74,7 +76,11 @@ export async function importMarkdown(
     type: "document",
     version: "0.1",
     metadata: {
-      title: inferTitle(children, options.filename),
+      title: frontmatter.metadata.title ?? inferTitle(children, options.filename),
+      subtitle: frontmatter.metadata.subtitle,
+      author: frontmatter.metadata.author,
+      lang: frontmatter.metadata.lang,
+      language: frontmatter.metadata.lang,
       sourceFormat: "markdown"
     },
     children,
@@ -102,6 +108,79 @@ export async function importMarkdown(
       }
     }
   };
+}
+
+
+type MarkdownFrontmatter = {
+  metadata: {
+    title?: string;
+    subtitle?: string;
+    author?: string;
+    lang?: string;
+  };
+  content: string;
+};
+
+function extractFrontmatter(value: string): MarkdownFrontmatter {
+  if (!value.startsWith("---\n") && !value.startsWith("---\r\n")) {
+    return {
+      metadata: {},
+      content: value
+    };
+  }
+
+  const lineEnding = value.startsWith("---\r\n") ? "\r\n" : "\n";
+  const closingDelimiter = `${lineEnding}---${lineEnding}`;
+  const closingIndex = value.indexOf(closingDelimiter, 3);
+
+  if (closingIndex === -1) {
+    return {
+      metadata: {},
+      content: value
+    };
+  }
+
+  const frontmatterValue = value.slice(3 + lineEnding.length, closingIndex);
+  const content = value.slice(closingIndex + closingDelimiter.length);
+
+  return {
+    metadata: parseFrontmatterFields(frontmatterValue),
+    content
+  };
+}
+
+function parseFrontmatterFields(value: string): MarkdownFrontmatter["metadata"] {
+  const metadata: MarkdownFrontmatter["metadata"] = {};
+  const allowedKeys = new Set(["title", "subtitle", "author", "lang"]);
+
+  for (const line of value.split(/\r?\n/)) {
+    const match = line.match(/^([A-Za-z][A-Za-z0-9_-]*)\s*:\s*(.*)$/);
+    if (!match) {
+      continue;
+    }
+
+    const key = match[1];
+    if (!allowedKeys.has(key)) {
+      continue;
+    }
+
+    const parsedValue = parseFrontmatterScalar(match[2]);
+    if (parsedValue.length > 0) {
+      metadata[key as keyof MarkdownFrontmatter["metadata"]] = parsedValue;
+    }
+  }
+
+  return metadata;
+}
+
+function parseFrontmatterScalar(value: string): string {
+  const trimmed = value.trim();
+
+  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+    return trimmed.slice(1, -1);
+  }
+
+  return trimmed;
 }
 
 function parseBlocks(
