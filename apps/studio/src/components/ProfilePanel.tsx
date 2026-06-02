@@ -23,6 +23,7 @@ export function ProfilePanel({
       </div>
       <select
         className="profile-select"
+        aria-label="Select layout profile"
         value={selectedProfilePath}
         onChange={(event) => onSelectProfile(event.target.value)}
       >

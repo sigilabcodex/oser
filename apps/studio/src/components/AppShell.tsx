@@ -9,11 +9,14 @@ import type {
 } from "../types";
 import { DiagnosticsPanel } from "./DiagnosticsPanel";
 import { ExportPanel } from "./ExportPanel";
+import { ManifestSummaryPanel } from "./ManifestSummaryPanel";
 import { PreviewPanel } from "./PreviewPanel";
 import { ProfilePanel } from "./ProfilePanel";
 import { SourcePanel } from "./SourcePanel";
 
 type ActionState = "idle" | "loading";
+type PreviewStatus = "not-rendered" | "rendered" | "stale" | "error";
+type ExportStatus = "not-exported" | "exported" | "stale" | "error";
 
 export function AppShell() {
   const [document, setDocument] = useState<StudioDocument | null>(null);
@@ -26,6 +29,11 @@ export function AppShell() {
   const [pdfManifest, setPdfManifest] = useState<RenderManifest | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>();
   const [pdfUrl, setPdfUrl] = useState<string | undefined>();
+  const [previewStatus, setPreviewStatus] = useState<PreviewStatus>("not-rendered");
+  const [exportStatus, setExportStatus] = useState<ExportStatus>("not-exported");
+  const [validateError, setValidateError] = useState<string | null>(null);
+  const [renderError, setRenderError] = useState<string | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
   const [actionState, setActionState] = useState<ActionState>("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -70,17 +78,35 @@ export function AppShell() {
     [profiles, selectedProfilePath]
   );
 
-  function clearDocumentOutputs() {
+  function clearActionState() {
     setDiagnostics(null);
-    setHtmlManifest(null);
-    setPdfManifest(null);
-    setPreviewUrl(undefined);
-    setPdfUrl(undefined);
+    setValidateError(null);
+    setRenderError(null);
+    setExportError(null);
+  }
+
+  function markOutputsStale() {
+    clearActionState();
+    setPreviewStatus(htmlManifest ? "stale" : "not-rendered");
+    setExportStatus(pdfManifest ? "stale" : "not-exported");
+  }
+
+  function markOutputsStaleForProfileChange(profilePath: string) {
+    setSelectedProfilePath(profilePath);
+    markOutputsStale();
+  }
+
+  function refreshPreview() {
+    if (!previewUrl) {
+      return;
+    }
+
+    setPreviewUrl(withCacheBust(previewUrl));
   }
 
   async function selectDocument(sourcePath: string) {
     setSelectedSourcePath(sourcePath);
-    clearDocumentOutputs();
+    markOutputsStale();
     await runAction(async () => {
       const loadedDocument = await fetchDocument(sourcePath);
       setDocument(loadedDocument);
@@ -88,13 +114,15 @@ export function AppShell() {
     });
   }
 
-  async function runAction(action: () => Promise<void>) {
+  async function runAction(action: () => Promise<void>, onError?: (message: string) => void) {
     setActionState("loading");
     setError(null);
     try {
       await action();
     } catch (actionError) {
-      setError(actionError instanceof Error ? actionError.message : String(actionError));
+      const message = actionError instanceof Error ? actionError.message : String(actionError);
+      setError(message);
+      onError?.(message);
     } finally {
       setActionState("idle");
     }
@@ -135,42 +163,74 @@ export function AppShell() {
           busy={isBusy}
           onSelectDocument={selectDocument}
         />
-        <PreviewPanel previewUrl={previewUrl} manifest={htmlManifest} />
+        <PreviewPanel
+          previewUrl={previewUrl}
+          manifest={htmlManifest}
+          status={previewStatus}
+          error={renderError}
+          onRefreshPreview={refreshPreview}
+        />
         <aside className="side-rail">
           <ProfilePanel
             profiles={profiles}
             selectedProfilePath={selectedProfilePath}
             selectedProfile={selectedProfile}
-            onSelectProfile={setSelectedProfilePath}
+            onSelectProfile={markOutputsStaleForProfileChange}
           />
           <ExportPanel
             busy={isBusy}
             htmlManifest={htmlManifest}
             pdfManifest={pdfManifest}
             pdfUrl={pdfUrl}
+            exportStatus={exportStatus}
+            validateError={validateError}
+            renderError={renderError}
+            exportError={exportError}
             onValidate={() => runAction(async () => {
+              setValidateError(null);
               const { sourcePath } = requireInputs();
               const result = await validateDocument(sourcePath);
               setDiagnostics(result.diagnostics);
-            })}
+            }, setValidateError)}
             onRenderHtml={() => runAction(async () => {
+              setRenderError(null);
               const { sourcePath, profilePath } = requireInputs();
               const result = await renderHtml(sourcePath, profilePath);
               setHtmlManifest(result.manifest);
               setDiagnostics(result.manifest.diagnostics);
-              setPreviewUrl(result.previewUrl ? `${result.previewUrl}?t=${Date.now()}` : undefined);
+              setPreviewUrl(result.previewUrl ? withCacheBust(result.previewUrl) : undefined);
+              setPreviewStatus("rendered");
+            }, (message) => {
+              setRenderError(message);
+              setPreviewStatus("error");
             })}
             onExportPdf={() => runAction(async () => {
+              setExportError(null);
               const { sourcePath, profilePath } = requireInputs();
               const result = await exportPdf(sourcePath, profilePath);
               setPdfManifest(result.manifest);
               setDiagnostics(result.manifest.diagnostics);
-              setPdfUrl(result.pdfUrl ? `${result.pdfUrl}?t=${Date.now()}` : undefined);
+              setPdfUrl(result.pdfUrl ? withCacheBust(result.pdfUrl) : undefined);
+              setExportStatus("exported");
+            }, (message) => {
+              setExportError(message);
+              setExportStatus("error");
             })}
+          />
+          <ManifestSummaryPanel
+            htmlManifest={htmlManifest}
+            pdfManifest={pdfManifest}
+            htmlStatus={previewStatus}
+            pdfStatus={exportStatus}
           />
           <DiagnosticsPanel diagnostics={diagnostics} />
         </aside>
       </section>
     </main>
   );
+}
+
+function withCacheBust(url: string): string {
+  const [baseUrl] = url.split("?");
+  return `${baseUrl}?t=${Date.now()}`;
 }
