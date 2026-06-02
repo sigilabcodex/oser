@@ -122,30 +122,18 @@ type MarkdownFrontmatter = {
 };
 
 function extractFrontmatter(value: string): MarkdownFrontmatter {
-  if (!value.startsWith("---\n") && !value.startsWith("---\r\n")) {
+  const match = value.match(/^---[ \t]*(?:\r?\n)([\s\S]*?)(?:\r?\n)---[ \t]*(?:\r?\n|$)/);
+
+  if (!match) {
     return {
       metadata: {},
       content: value
     };
   }
-
-  const lineEnding = value.startsWith("---\r\n") ? "\r\n" : "\n";
-  const closingDelimiter = `${lineEnding}---${lineEnding}`;
-  const closingIndex = value.indexOf(closingDelimiter, 3);
-
-  if (closingIndex === -1) {
-    return {
-      metadata: {},
-      content: value
-    };
-  }
-
-  const frontmatterValue = value.slice(3 + lineEnding.length, closingIndex);
-  const content = value.slice(closingIndex + closingDelimiter.length);
 
   return {
-    metadata: parseFrontmatterFields(frontmatterValue),
-    content
+    metadata: parseFrontmatterFields(match[1]),
+    content: value.slice(match[0].length)
   };
 }
 
