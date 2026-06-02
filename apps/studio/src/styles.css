@@ -381,6 +381,75 @@ h2 {
   text-decoration: none;
 }
 
+
+.render-history-list {
+  margin: 0;
+  padding: 0 14px;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.render-history-list li {
+  padding: 10px;
+  border: 1px solid #e2e6ea;
+  border-radius: 6px;
+  background: #fbfcfd;
+}
+
+.render-history-list li.active {
+  border-color: #8cc2b9;
+  background: #eef9f7;
+}
+
+.render-history-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.render-history-main strong {
+  color: #20242a;
+  font-size: 13px;
+}
+
+.render-history-main span,
+.render-history-list small {
+  color: #697280;
+  font-size: 11px;
+}
+
+.render-history-list p {
+  margin: 6px 0 2px;
+  color: #2b3037;
+  font-size: 12px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.render-history-actions {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.render-history-actions span {
+  color: #4c5663;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.render-history-actions a {
+  color: #1b5f95;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
 .diagnostic-summary {
   padding: 14px;
   display: grid;

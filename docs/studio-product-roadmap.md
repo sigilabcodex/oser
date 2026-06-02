@@ -284,10 +284,9 @@ The current MVP writes shared outputs under `dist/studio`. That is acceptable fo
 ### Current Problem
 
 - Outputs are shared in `dist/studio`.
-- There is no stable render identity.
-- Renders are not concurrent-safe.
-- A new render can overwrite the previous preview/export.
-- Multiple documents cannot remain open with independent outputs.
+- A first `renderId` implementation exists for Studio renders.
+- Renders are not yet fully concurrent-job managed.
+- Multiple documents do not yet have rich tabbed workspace state.
 
 ### Target Design
 
@@ -426,7 +425,7 @@ Difficulty: Low, Medium, High. Risk: Low, Medium, High.
 | Next | LayoutProfile form controls | Non-programmers can adjust layout | Medium | Profile validation | Medium | apps/studio |
 | Next | Temporary profile render | Safe experimentation | Medium | Profile storage contract | Medium | studio-server, apps/studio |
 | Next | Duplicate profile variant | Designers can branch profile ideas | Medium | Project/profile storage | Medium | studio-server, apps/studio |
-| Next | Render IDs | Prevent output overwrites | High | Output contract update | High | studio-server, apps/studio |
+| Now | Render IDs, first pass | Prevent output overwrites and enable render history | Medium | Output contract update | Medium | studio-server, apps/studio |
 | Later | Preview element selection | Bridge preview and structure | High | Source mapping/block IDs | High | Core, studio-server, apps/studio |
 | Later | Structured overrides | Controlled WYSIWYG-ish behavior | High | Override schema/render support | High | Core, studio-server, apps/studio |
 | Later | Project open flow | Real user documents | High | Filesystem strategy | High | studio-server, apps/studio |

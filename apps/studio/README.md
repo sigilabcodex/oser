@@ -18,17 +18,20 @@ The frontend runs at `http://127.0.0.1:5173` and proxies `/api`, `/preview`, and
 
 ## What It Does
 
-- loads `GET /api/studio/document`
+- loads `GET /api/studio/documents` and `GET /api/studio/document?sourcePath=...`
 - loads `GET /api/studio/profiles`
 - shows the Markdown source read-only
 - selects an allowlisted layout profile
 - validates through `POST /api/studio/validate`
 - renders HTML through `POST /api/studio/render-html`
 - previews generated HTML in an iframe
-- exports PDF through `POST /api/studio/export-pdf`
+- exports PDF through `POST /api/studio/export-pdf`, reusing the current `renderId` when available
 - links to the generated PDF
+- displays RenderManifest/output summaries
+- lists recent renders from `GET /api/studio/renders`
+- loads previous previews from render history
 - displays diagnostics returned by the server
-- loads preview images through server allowlisted `/preview/assets/...` URLs
+- loads preview images through server allowlisted render URLs
 
 ## Boundary
 
@@ -46,7 +49,7 @@ Studio is optional UI. Core remains usable from CLI commands, scripts, tests, an
 - fixed server fixtures and allowlisted paths
 - preview asset handling is limited to known files under `examples/assets/`
 - no WYSIWYG editor
-- no project persistence
+- no project persistence beyond local render history under `dist/studio/renders/`
 - no Git/checkpoint workflow
 - no Tauri/Electron shell
 - no standalone production serving path yet

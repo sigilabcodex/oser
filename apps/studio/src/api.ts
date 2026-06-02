@@ -6,6 +6,8 @@ import type {
   StudioDocumentListResponse,
   StudioDocumentSummary,
   StudioProfile,
+  StudioRenderHistoryItem,
+  StudioRenderHistoryResponse,
   ValidateResponse
 } from "./types";
 
@@ -38,11 +40,20 @@ export async function renderHtml(sourcePath: string, profilePath: string): Promi
   });
 }
 
-export async function exportPdf(sourcePath: string, profilePath: string): Promise<ExportPdfResponse> {
+export async function exportPdf(
+  sourcePath: string,
+  profilePath: string,
+  renderId?: string
+): Promise<ExportPdfResponse> {
   return requestJson<ExportPdfResponse>("/api/studio/export-pdf", {
     method: "POST",
-    body: JSON.stringify({ sourcePath, profilePath })
+    body: JSON.stringify({ sourcePath, profilePath, renderId })
   });
+}
+
+export async function fetchRenderHistory(): Promise<StudioRenderHistoryItem[]> {
+  const response = await requestJson<StudioRenderHistoryResponse>("/api/studio/renders");
+  return response.renders;
 }
 
 async function requestJson<T>(url: string, options: RequestInit = {}): Promise<T> {

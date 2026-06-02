@@ -1,17 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
-import { exportPdf, fetchDocument, fetchDocuments, fetchProfiles, renderHtml, validateDocument } from "../api";
+import { exportPdf, fetchDocument, fetchDocuments, fetchProfiles, fetchRenderHistory, renderHtml, validateDocument } from "../api";
 import type {
   DiagnosticsPayload,
   RenderManifest,
   StudioDocument,
   StudioDocumentSummary,
-  StudioProfile
+  StudioProfile,
+  StudioRenderHistoryItem
 } from "../types";
 import { DiagnosticsPanel } from "./DiagnosticsPanel";
 import { ExportPanel } from "./ExportPanel";
 import { ManifestSummaryPanel } from "./ManifestSummaryPanel";
 import { PreviewPanel } from "./PreviewPanel";
 import { ProfilePanel } from "./ProfilePanel";
+import { RenderHistoryPanel } from "./RenderHistoryPanel";
 import { SourcePanel } from "./SourcePanel";
 
 type ActionState = "idle" | "loading";
@@ -27,6 +29,8 @@ export function AppShell() {
   const [diagnostics, setDiagnostics] = useState<DiagnosticsPayload | null>(null);
   const [htmlManifest, setHtmlManifest] = useState<RenderManifest | null>(null);
   const [pdfManifest, setPdfManifest] = useState<RenderManifest | null>(null);
+  const [currentRenderId, setCurrentRenderId] = useState<string | undefined>();
+  const [renderHistory, setRenderHistory] = useState<StudioRenderHistoryItem[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>();
   const [pdfUrl, setPdfUrl] = useState<string | undefined>();
   const [previewStatus, setPreviewStatus] = useState<PreviewStatus>("not-rendered");
@@ -44,7 +48,11 @@ export function AppShell() {
       setActionState("loading");
       setError(null);
       try {
-        const [loadedDocuments, loadedProfiles] = await Promise.all([fetchDocuments(), fetchProfiles()]);
+        const [loadedDocuments, loadedProfiles, loadedRenders] = await Promise.all([
+          fetchDocuments(),
+          fetchProfiles(),
+          fetchRenderHistory()
+        ]);
         const initialSourcePath = loadedDocuments[0]?.path;
         const loadedDocument = await fetchDocument(initialSourcePath);
         if (cancelled) {
@@ -54,6 +62,7 @@ export function AppShell() {
         setDocument(loadedDocument);
         setSelectedSourcePath(loadedDocument.sourcePath);
         setProfiles(loadedProfiles);
+        setRenderHistory(loadedRenders);
         setSelectedProfilePath(loadedProfiles[0]?.path ?? "");
       } catch (loadError) {
         if (!cancelled) {
@@ -87,6 +96,7 @@ export function AppShell() {
 
   function markOutputsStale() {
     clearActionState();
+    setCurrentRenderId(undefined);
     setPreviewStatus(htmlManifest ? "stale" : "not-rendered");
     setExportStatus(pdfManifest ? "stale" : "not-exported");
   }
@@ -102,6 +112,26 @@ export function AppShell() {
     }
 
     setPreviewUrl(withCacheBust(previewUrl));
+  }
+
+  async function refreshRenderHistory() {
+    setRenderHistory(await fetchRenderHistory());
+  }
+
+  function loadHistoricalPreview(render: StudioRenderHistoryItem) {
+    if (!render.previewUrl) {
+      return;
+    }
+
+    clearActionState();
+    setCurrentRenderId(render.renderId);
+    setHtmlManifest(render.htmlManifest ?? null);
+    setPdfManifest(render.pdfManifest ?? null);
+    setPreviewUrl(withCacheBust(render.previewUrl));
+    setPdfUrl(render.pdfUrl ? withCacheBust(render.pdfUrl) : undefined);
+    setPreviewStatus(render.hasHtml ? "rendered" : "not-rendered");
+    setExportStatus(render.hasPdf ? "exported" : "not-exported");
+    setDiagnostics(render.pdfManifest?.diagnostics ?? render.htmlManifest?.diagnostics ?? null);
   }
 
   async function selectDocument(sourcePath: string) {
@@ -196,10 +226,15 @@ export function AppShell() {
               setRenderError(null);
               const { sourcePath, profilePath } = requireInputs();
               const result = await renderHtml(sourcePath, profilePath);
+              setCurrentRenderId(result.renderId);
               setHtmlManifest(result.manifest);
+              setPdfManifest(null);
+              setPdfUrl(undefined);
               setDiagnostics(result.manifest.diagnostics);
               setPreviewUrl(result.previewUrl ? withCacheBust(result.previewUrl) : undefined);
               setPreviewStatus("rendered");
+              setExportStatus("not-exported");
+              await refreshRenderHistory();
             }, (message) => {
               setRenderError(message);
               setPreviewStatus("error");
@@ -207,11 +242,19 @@ export function AppShell() {
             onExportPdf={() => runAction(async () => {
               setExportError(null);
               const { sourcePath, profilePath } = requireInputs();
-              const result = await exportPdf(sourcePath, profilePath);
+              const renderIdForExport = currentRenderId;
+              const result = await exportPdf(sourcePath, profilePath, renderIdForExport);
+              setCurrentRenderId(result.renderId);
+              if (!renderIdForExport && previewStatus === "stale") {
+                setHtmlManifest(null);
+                setPreviewUrl(undefined);
+                setPreviewStatus("not-rendered");
+              }
               setPdfManifest(result.manifest);
               setDiagnostics(result.manifest.diagnostics);
               setPdfUrl(result.pdfUrl ? withCacheBust(result.pdfUrl) : undefined);
               setExportStatus("exported");
+              await refreshRenderHistory();
             }, (message) => {
               setExportError(message);
               setExportStatus("error");
@@ -222,6 +265,11 @@ export function AppShell() {
             pdfManifest={pdfManifest}
             htmlStatus={previewStatus}
             pdfStatus={exportStatus}
+          />
+          <RenderHistoryPanel
+            renders={renderHistory}
+            activeRenderId={currentRenderId}
+            onLoadPreview={loadHistoricalPreview}
           />
           <DiagnosticsPanel diagnostics={diagnostics} />
         </aside>

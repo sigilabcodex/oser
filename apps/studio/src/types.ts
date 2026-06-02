@@ -74,11 +74,33 @@ export type RenderManifest = {
 };
 
 export type RenderHtmlResponse = {
+  renderId: string;
   manifest: RenderManifest;
   previewUrl?: string;
 };
 
 export type ExportPdfResponse = {
+  renderId: string;
   manifest: RenderManifest;
   pdfUrl?: string;
+};
+
+export type StudioRenderHistoryItem = {
+  renderId: string;
+  sourcePath: string;
+  profilePath?: string;
+  generatedAt: string;
+  hasHtml: boolean;
+  hasPdf: boolean;
+  previewUrl?: string;
+  pdfUrl?: string;
+  diagnostics?: {
+    summary: DiagnosticSummary;
+  };
+  htmlManifest?: RenderManifest;
+  pdfManifest?: RenderManifest;
+};
+
+export type StudioRenderHistoryResponse = {
+  renders: StudioRenderHistoryItem[];
 };

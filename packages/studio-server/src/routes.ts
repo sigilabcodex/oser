@@ -5,6 +5,7 @@ import { extname } from "node:path";
 import {
   exportStudioPdf,
   getStudioDocument,
+  listStudioRenders,
   renderStudioHtml,
   validateStudioDocument
 } from "./oserPipeline";
@@ -39,6 +40,11 @@ export async function handleStudioRequest(request: IncomingMessage, response: Se
       return;
     }
 
+    if (method === "GET" && url.pathname === "/api/studio/renders") {
+      sendJson(response, 200, await listStudioRenders());
+      return;
+    }
+
     if (method === "POST" && url.pathname === "/api/studio/validate") {
       sendJson(response, 200, await validateStudioDocument(await readJsonBody(request)));
       return;
@@ -63,7 +69,7 @@ export async function handleStudioRequest(request: IncomingMessage, response: Se
   } catch (error) {
     const code = error instanceof StudioProjectError ? error.code : "studio-server-error";
     const message = error instanceof Error ? error.message : String(error);
-    sendJson(response, code === "path-not-allowed" ? 403 : 500, errorResponse(code, message));
+    sendJson(response, isForbiddenErrorCode(code) ? 403 : 500, errorResponse(code, message));
   }
 }
 
@@ -125,7 +131,15 @@ function isAllowedStaticRoute(pathname: string): boolean {
     || pathname === "/preview/profile-classic-book.css"
     || pathname === "/preview/profile-report.css"
     || pathname === "/preview/assets/placeholder.svg"
-    || pathname === "/outputs/export.pdf";
+    || pathname === "/outputs/export.pdf"
+    || /^\/preview\/renders\/[^/]+\/preview\.html$/.test(pathname)
+    || /^\/preview\/renders\/[^/]+\/assets\/placeholder\.svg$/.test(pathname)
+    || /^\/preview\/renders\/[^/]+\/(editorial|profile-[a-z0-9-]+)\.css$/i.test(pathname)
+    || /^\/outputs\/renders\/[^/]+\/export\.pdf$/.test(pathname);
+}
+
+function isForbiddenErrorCode(code: string): boolean {
+  return code === "path-not-allowed" || code === "render-id-not-allowed";
 }
 
 function sendJson(response: ServerResponse, statusCode: number, payload: unknown): void {

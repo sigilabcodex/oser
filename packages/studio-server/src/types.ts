@@ -34,6 +34,7 @@ export type StudioRenderRequest = {
   sourcePath?: string;
   profilePath?: string;
   profileId?: string;
+  renderId?: string;
 };
 
 export type StudioExportPdfRequest = StudioRenderRequest & {
@@ -50,9 +51,30 @@ export type StudioValidateResponse = {
 };
 
 export type StudioRenderManifestResponse = {
+  renderId: string;
   manifest: RenderManifest;
   previewUrl?: string;
   pdfUrl?: string;
+};
+
+export type StudioRenderHistoryItem = {
+  renderId: string;
+  sourcePath: string;
+  profilePath?: string;
+  generatedAt: string;
+  hasHtml: boolean;
+  hasPdf: boolean;
+  previewUrl?: string;
+  pdfUrl?: string;
+  diagnostics?: {
+    summary: RenderManifestDiagnosticsSummary;
+  };
+  htmlManifest?: RenderManifest;
+  pdfManifest?: RenderManifest;
+};
+
+export type StudioRenderHistoryResponse = {
+  renders: StudioRenderHistoryItem[];
 };
 
 export type StudioErrorResponse = {
