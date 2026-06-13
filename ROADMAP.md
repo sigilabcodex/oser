@@ -1,6 +1,8 @@
 # OSER Roadmap
 
-This roadmap describes the current implementation state and likely next steps. It is not a release promise. OSER is an experimental publishing and rendering engine, not a finished desktop publishing system.
+This roadmap describes the current implementation state and likely next steps. It is not a release promise. OSER is an experimental editorial orchestration and validation platform with a working rendering prototype, not a finished desktop publishing system or universal renderer.
+
+The official architectural direction is documented in `docs/editorial-orchestration-architecture.md`.
 
 ## Done
 
@@ -56,6 +58,24 @@ This roadmap describes the current implementation state and likely next steps. I
 - CLI validation command.
 - Initial document checks for title, empty headings and paragraphs, heading level jumps, image metadata, empty tables, table row consistency, missing link hrefs, and empty code blocks.
 
+### Layout Profile
+
+- `@oser/layout-profile` package.
+- Experimental typed layout profile objects and CSS generation.
+- Current profile CSS can be used by `render:html` and `render:pdf` without replacing existing CSS presets.
+
+### Render Manifests
+
+- `@oser/render-manifest` package.
+- Optional JSON manifests for successful HTML and PDF render/export runs.
+- Current manifests record source paths, render settings, generated outputs, profile CSS, and diagnostics.
+
+### Studio MVP
+
+- `packages/studio-server` optional local adapter.
+- `apps/studio` Vite + React reference app.
+- Current Studio flow can inspect a fixed source fixture, select a layout profile, validate, render HTML preview, and export PDF through existing OSER Core APIs.
+
 ### Commands And Examples
 
 - `npm run build`
@@ -72,136 +92,105 @@ This roadmap describes the current implementation state and likely next steps. I
 
 ## In Progress
 
-### Stabilizing The Core Pipeline
+### Stabilizing The Current Pipeline
 
 - Clarify package boundaries.
 - Keep the document model independent from render and export concerns.
 - Keep generated artifacts reproducible.
 - Improve documentation so it matches the actual implementation.
+- Preserve current TXT, Markdown, HTML, diagnostics, layout profile, manifest, Studio MVP, and experimental PDF capabilities.
 
-### HTML And CSS Contracts
+### Reframing OSER As Orchestration Infrastructure
 
-- Continue making semantic HTML conventions stable and inspectable.
-- Keep default CSS useful but overrideable by downstream projects.
-- Treat print CSS as a foundation for later paged-media work, not as a complete book layout system.
+- Treat rendering as one capability layer rather than the entire architecture.
+- Keep semantic HTML as OSER's native preview and inspection output.
+- Define project understanding, manifests, validation, adapters, and Studio as separate layers.
+- Avoid describing OSER as a universal renderer implemented from scratch.
 
-### Diagnostics
+## Next: Three-Phase Direction
 
-- Expand diagnostics carefully without turning them into project-specific editorial policy.
-- Keep diagnostics reusable from CLI, future GUI surfaces, integrations, and CI.
+### Phase 1: Project Understanding
 
-### Layout Profile
+Goal: OSER should understand an editorial repository before rendering it.
 
-- Introduce an experimental typed `LayoutProfile` layer for page settings, margins, typography, block styles, figures, tables, and print behavior.
-- Generate CSS from profile JSON without replacing current `editorial.css`, `print.css`, or renderer behavior.
-- Keep the first profile schema small enough for future Studio controls to edit safely.
+Planned work:
 
-## Next
+- project contracts;
+- project manifests;
+- project scanner;
+- asset graph;
+- project-level diagnostics;
+- figure sidecar grouping;
+- generated-output and stale-artifact checks;
+- reproducibility metadata foundations.
 
-### OSER Studio Design Line
+This phase is the next implementation priority. It does not exist yet.
 
-- Document a future Studio UX without implementing a GUI yet.
-- Define Studio as a visual control surface for OSER Core, not as a replacement for the core packages.
-- Keep `studio-server` as an optional adapter contract between a future Studio UI and OSER Core.
-- Keep the first Studio concept focused on structure inspection, diagnostics, paginated preview, checkpoints, variants, and export control.
-- Avoid promising freeform WYSIWYG, pixel-perfect page layout, or a total InDesign/Scribus replacement.
-- Treat TRURL as a possible first host or consumer while keeping Studio separable as a future app.
+### Phase 2: Renderer Adapters
 
-Phased Studio direction:
+Goal: OSER should orchestrate mature renderers through explicit adapters instead of reimplementing every export format.
 
-- Phase 0: UX documentation and conceptual architecture.
-- Phase 1: documented `studio-server` MVP contract around fixed fixtures and `dist/studio/` outputs.
-- Phase 2: optional local Node server with fixture-backed endpoints.
-- Phase 3: render HTML and validate endpoints using OSER Core and `RenderManifest`.
-- Phase 4: PDF export endpoint using the experimental PDF pipeline.
-- Phase 5: first optional React app consuming the server endpoints.
-- Phase 6: layout profile inspector and style preset selection.
-- Phase 7: diagnostics UI for import, structure, layout, and export readiness.
-- Phase 8: Git checkpoints and variants expressed in editorial language.
-- Phase 9: export panel for PDF, EPUB, HTML, and generated artifact metadata.
-- Phase 10: limited visual editing for supported declarative controls only.
-- Phase 11: AI-assisted layout exploration with transparent diagnostics and user approval.
+Planned adapter targets:
 
-See `docs/studio-server-contract.md` for the current MVP server contract.
+- Pandoc for DOCX, EPUB, and citation-aware exports.
+- Optional Quarto for scholarly or technical publishing workflows.
+- Playwright/Paged.js for custom HTML-to-PDF workflows.
+- Astro for web or microsite publication.
 
-### WebBook Export Design Line
+Adapters should record renderer use, inputs, outputs, settings, warnings, diagnostics, and reproducibility details through manifests. These adapters do not exist yet.
 
-- Document a future browser-based reading export without implementing it yet.
-- Define WebBook as a self-contained HTML file or portable static folder, not as an EPUB replacement.
-- Keep WebBook separate from the current semantic HTML renderer, PDF exporter, and future EPUB exporter.
-- Introduce `ReadingProfile` as a proposed reader-behavior contract distinct from `LayoutProfile`.
-- Treat bookmarks, annotations, search, local persistence, and offline behavior as incremental reader features.
-- Keep the first architecture compatible with static publishing, local archives, and microsite-style deployment.
+### Phase 3: Studio And Visual Validation
 
-Phased WebBook direction:
+Goal: Studio should become the GUI surface for project understanding, diagnostics, renderer orchestration, visual inspection, and publication readiness.
 
-- Phase 1: static WebBook shell around semantic HTML.
-- Phase 2: navigable TOC and reader settings.
-- Phase 3: bookmarks and notes through localStorage.
-- Phase 4: client-side search.
-- Phase 5: optional offline/PWA support for compatible static-folder deployments.
-- Phase 6: export and import annotations.
-- Phase 7: Studio integration as a selectable export target.
+Planned work:
 
-### GUI Preview Surface
+- project dashboard;
+- asset graph browser;
+- diagnostics by document, project, asset, figure, and render output;
+- render target selection;
+- render history;
+- visual inspection reports;
+- figure sidecar inspection;
+- radical proportionality validation reports;
+- publication readiness views.
 
-- Add a lightweight inspection GUI or app surface around the existing pipeline.
-- Initial GUI should likely load source files, show diagnostics, preview generated HTML, and trigger export commands.
-- It should call OSER packages rather than duplicating rendering logic.
-- It should not begin as a WYSIWYG editor.
+The current Studio MVP remains valid, but these project-level and visual validation capabilities do not exist yet.
 
-### TRURL Integration
-
-- Define the integration contract between TRURL and OSER.
-- Support repository-backed editorial content, preview, diagnostics, and export workflows.
-- Keep TRURL product behavior separate from OSER rendering behavior.
-
-### DOCX Import Workflow
-
-- Design a DOCX-to-`OserDocument` mapping before implementation.
-- Start with headings, paragraphs, emphasis, strong, links, lists, tables, and images.
-- Define asset extraction and warning behavior.
-- Preserve conversion uncertainty through diagnostics or import warnings.
-
-### Paged.js Preview
-
-- Add a browser-based paginated preview path.
-- Keep Paged.js preview separate from the basic HTML renderer and the current PDF adapter.
-- Define explicit conventions for page breaks, running elements, and print-only layout features.
-
-### Advanced PDF Work
-
-- Build on semantic HTML, print CSS, and eventual Paged.js support.
-- Add support for folios, running headers, front matter, generated contents, and more deterministic page behavior.
-- Add visual or artifact-level regression fixtures before expanding PDF behavior too far.
-
-## Future
-
-### EPUB Export
-
-- Generate EPUB from the same document model and semantic HTML layer.
-- Define packaging, metadata, asset, and validation requirements.
-
-### Astro And Web Publishing Integrations
-
-- Provide integration points for static site workflows.
-- Keep web publishing adapters separate from OSER core.
-
-### Richer Asset Pipeline
-
-- Track imported assets.
-- Copy, resolve, and optionally fingerprint images or linked files.
-- Keep asset manifests inspectable.
+## Future Areas
 
 ### Advanced Editorial Structures
 
-- Notes.
-- Citations.
-- References.
-- Captions beyond the current minimal figure support.
-- Cross references.
-- Tables of contents.
-- Front matter and back matter.
+Future document and project contracts may need to represent:
+
+- notes;
+- citations;
+- references;
+- captions beyond the current minimal figure support;
+- cross references;
+- tables of contents;
+- front matter and back matter;
+- appendices;
+- multi-volume projects;
+- multilingual project variants.
+
+### Visual And Figure Validation
+
+Future validation should inspect generated and source visual assets where possible.
+
+Possible capabilities:
+
+- file inspection for SVG, PNG, JPEG, PDF, Markdown, CSV, and JSON;
+- missing-image checks;
+- SVG validity checks;
+- unsafe SVG or HTML content warnings;
+- rendered HTML/PDF visual smoke checks;
+- figure sidecar validation;
+- radical proportionality validation for declared quantitative figures.
+
+### WebBook And Reading Exports
+
+A future browser-based reading export may still be useful, but it should fit the orchestration architecture. It should not replace EPUB, Pandoc, Quarto, Astro, or the native semantic HTML preview layer.
 
 ### Package Publishing
 
@@ -210,11 +199,21 @@ Phased WebBook direction:
 
 ## Not Currently Implemented
 
-- GUI.
+- Project model.
+- Project scanner.
+- Asset graph.
+- Project manifests beyond current render manifests.
+- Pandoc adapter.
+- Quarto adapter.
+- Astro adapter.
+- Paged.js adapter.
+- Visual inspection pipeline.
+- Figure validation.
+- Radical proportionality validation.
 - DOCX importer.
 - EPUB export.
-- Paged.js preview.
 - Advanced PDF layout.
+- Full project-level GUI workflows.
 - InDesign-style visual editing.
 - Full editorial linting.
 - Full asset pipeline.

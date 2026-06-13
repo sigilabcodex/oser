@@ -2,13 +2,17 @@
 
 Open Source Editorial Renderer.
 
-OSER is an experimental publishing and rendering engine for turning structured source text into durable editorial outputs. It keeps source content, document structure, presentation, validation, and export steps separate so rendered artifacts can be regenerated from versioned source files.
+OSER is an experimental editorial orchestration and validation platform for source-first publishing projects. Rendering remains an important capability, but it is one layer in a larger architecture that keeps source content, document and project structure, assets, diagnostics, layout settings, render manifests, and reproducibility evidence separate.
 
 Current status: early functional prototype. OSER can import TXT and Markdown, produce an internal document model, render semantic HTML, apply editorial or print-oriented CSS, run basic document diagnostics, and generate experimental PDFs through Playwright and Chromium.
 
 It is not an InDesign replacement, WYSIWYG editor, CMS, or visual page builder.
 
+OSER should not be understood as a universal renderer implemented from scratch. The official direction is to provide a common editorial model, diagnostics layer, manifest system, semantic preview path, and future Studio/server contracts while delegating mature format conversion through explicit adapters where that is the better engineering choice.
+
 ## Current Pipeline
+
+The current implemented pipeline remains valid:
 
 ```text
 TXT / Markdown
@@ -21,6 +25,20 @@ TXT / Markdown
 ```
 
 The source document remains the primary artifact. Generated HTML, temporary HTML, and PDFs are derived artifacts and should be reproducible from the source plus renderer settings.
+
+The intended architecture expands this into a project-level orchestration flow:
+
+```text
+editorial project tree
+  -> project scanner and asset graph (planned)
+  -> document/project contracts and manifests
+  -> diagnostics and validation
+  -> native semantic HTML preview
+  -> native or external render adapters
+  -> render, inspection, and reproducibility manifests
+```
+
+The next implementation phase is project understanding: project-model, project-scanner, and asset-graph work. These do not exist yet.
 
 ## Packages
 
@@ -42,7 +60,16 @@ Current CLI input support:
 - `.md`
 - `.markdown`
 
-DOCX, EPUB, Paged.js preview, advanced PDF layout, and GUI workflows are planned or likely future work, but they do not exist yet.
+DOCX, EPUB, Paged.js preview, advanced PDF layout, project scanning, asset graphs, external renderer adapters, visual inspection, and richer GUI workflows are planned or likely future work, but they do not exist yet.
+
+Mature format conversion should be delegated through explicit adapters where appropriate:
+
+- Pandoc for DOCX, EPUB, and citation-aware exports.
+- Optional Quarto for scholarly or technical publishing workflows.
+- Playwright/Paged.js for custom HTML-to-PDF workflows.
+- Astro for web or microsite publication.
+
+These adapters are architectural targets, not current package capabilities.
 
 ## Commands
 
@@ -168,9 +195,13 @@ Current PDF limitations:
 
 ## Scope
 
-OSER is focused on the rendering pipeline and the portable document representation beneath publishing outputs.
+OSER is focused on editorial orchestration and validation: the portable document/project contracts beneath publishing outputs, the diagnostics and manifest layers around those outputs, and the native preview path used to inspect them.
 
-It should provide reusable infrastructure for downstream projects such as TRURL, diegomadero.com, editorial-ai-lab, and future GUI or publishing workflows. Those projects can own product UI, site generation, automation, deployment, and editorial policy.
+OSER owns document and project contracts, project manifests, asset graphs, diagnostics, layout profiles, render and reproducibility manifests, semantic HTML previews, visual and figure validation, and Studio/server contracts. Some of these are implemented today; others are planned architecture.
+
+Downstream projects and external tools can own product UI, site generation, automation, deployment, mature format conversion, and project-specific editorial policy.
+
+See `docs/editorial-orchestration-architecture.md` for the official architectural direction.
 
 ## Repository Layout
 

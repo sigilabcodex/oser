@@ -1,54 +1,89 @@
 # Principles
 
-OSER is early-stage software with a working rendering pipeline. These principles keep the project focused as it grows from prototype toward reusable publishing infrastructure.
+OSER is early-stage software with a working rendering pipeline. These principles keep the project focused as it grows from prototype toward reusable editorial orchestration and validation infrastructure.
 
 ## Source First
 
-Markdown, structured plain text, and future imported formats should remain inspectable and versionable. Source files are the canonical inputs. HTML, temporary files, PDFs, and other outputs are derived artifacts.
+Markdown, structured plain text, project data, figures, sidecars, and future imported formats should remain inspectable and versionable. Source files are the canonical inputs. HTML, temporary files, PDFs, DOCX, EPUB, static sites, inspection reports, and other outputs are derived artifacts.
 
-## Document Model First
+## Editorial Orchestration First
 
-OSER should preserve editorial structure in a portable `OserDocument` before rendering to a specific output.
+OSER is not a universal renderer implemented from scratch. OSER should coordinate source files, document and project contracts, assets, diagnostics, layout profiles, renderer adapters, and manifests so publishing workflows remain reproducible and inspectable.
 
-The model should describe document meaning, not product UI, browser automation, or page geometry.
+Rendering remains important, but it is one capability layer rather than the entire architecture.
 
-## Semantic HTML First
+## Document And Project Contracts First
 
-Semantic HTML is the central output layer before PDF, EPUB, paged preview, or web-specific integrations.
+OSER should preserve editorial structure in portable contracts before rendering to a specific output.
 
-HTML should be meaningful, inspectable, and stable enough for downstream tools to style or transform.
+The current `OserDocument` contract describes single-document structure. Future project contracts should describe multi-file and multi-volume editorial projects, including manifests, assets, figures, bibliography files, appendices, notes, logs, and generated outputs.
+
+These contracts should describe editorial meaning and relationships, not product UI, browser automation, or page geometry.
+
+## Semantic HTML Preview First
+
+Semantic HTML is OSER's native preview and inspection layer. It should remain meaningful, inspectable, and stable enough for downstream tools, diagnostics, Studio, and renderer adapters to consume.
+
+Semantic HTML is not the only possible final output. DOCX, EPUB, scholarly PDF, and microsite publication can be delegated through explicit adapters where mature tools are better suited.
+
+## Delegate Mature Format Conversion
+
+OSER should not reimplement mature FLOSS conversion systems without a strong reason.
+
+Planned delegated targets:
+
+- Pandoc for DOCX, EPUB, and citation-aware exports.
+- Optional Quarto for scholarly or technical publishing workflows.
+- Playwright/Paged.js for custom HTML-to-PDF workflows.
+- Astro for web or microsite publication.
+
+Adapters should be explicit, optional where appropriate, and recorded in render or reproducibility manifests.
 
 ## Keep Rendering Separate From UI
 
-Rendering belongs in reusable packages and APIs. User interfaces, site integrations, product workflows, and deployment logic should call into OSER rather than embedding renderer logic.
+Rendering and adapter orchestration belong in reusable packages and APIs. User interfaces, site integrations, product workflows, and deployment logic should call into OSER rather than embedding renderer logic.
 
-OSER Studio, if implemented, should be an optional client of OSER Core. Core should not import Studio code, require Studio dependencies, or hide rendering behavior behind Studio-only state.
+OSER Studio should be an optional client of OSER Core. Core should not import Studio code, require Studio dependencies, or hide rendering behavior behind Studio-only state.
 
 ## Core First, UI Optional
 
 The CLI and package APIs should remain usable without Studio.
 
-Studio can make the pipeline easier to inspect and operate, but generated outputs must remain reproducible from source files, profiles, and Core commands. This keeps OSER useful for developers, automation, TRURL, diegomadero.com, and server-side editorial workflows.
+Studio can make the pipeline easier to inspect and operate, but generated outputs must remain reproducible from source files, profiles, manifests, and Core or adapter commands. This keeps OSER useful for developers, automation, TRURL, diegomadero.com, and server-side editorial workflows.
+
+## Project Understanding Before Complex Publishing
+
+The next implementation phase should help OSER understand editorial repositories before expanding export ambition.
+
+Priority future work:
+
+```text
+project-model + project-scanner + asset-graph
+```
+
+A project understanding layer should make missing assets, stale generated files, figure sidecars, data dependencies, and project-level diagnostics visible before any renderer is invoked.
 
 ## No WYSIWYG Initially
 
-OSER should not begin as a visual editor. A future GUI can help inspect, preview, validate, and export documents, but the first priority is a reliable import/render/export pipeline.
+OSER should not begin as a visual editor. Studio can help inspect, preview, validate, render, and export documents, but the priority is reliable orchestration, validation, and reproducibility.
 
 ## Honest Experimental Scope
 
-OSER is not an InDesign replacement. It is an experimental publishing and rendering engine.
+OSER is not an InDesign replacement. It is an experimental editorial orchestration and rendering platform.
 
-Advanced PDF layout, Paged.js preview, GUI workflows, EPUB export, DOCX import, and full asset management are future work unless explicitly implemented.
+Project scanning, asset graphs, Pandoc adapters, Quarto adapters, Astro adapters, Paged.js workflows, visual inspection, figure validation, and full project-level publishing are future work unless explicitly implemented.
 
 ## Outputs Are Reproducible Artifacts
 
-Generated outputs should be rebuildable from source content and renderer settings. This keeps repository workflows reviewable and reduces manual drift between source and output.
+Generated outputs should be rebuildable from source content, project data, renderer settings, profiles, and recorded toolchain metadata. This keeps repository workflows reviewable and reduces manual drift between source and output.
 
 ## Diagnostics Are Shared Infrastructure
 
-Diagnostics should be reusable from the CLI, future GUI surfaces, CI, TRURL, and other integrations.
+Diagnostics should be reusable from the CLI, future GUI surfaces, CI, TRURL, renderer adapters, and other integrations.
 
-They should report structural and rendering-relevant issues without becoming a project-specific editorial style guide by default.
+They should report structural, project, asset, rendering, and reproducibility issues without becoming a project-specific editorial style guide by default.
+
+Project-specific editorial rules can still be expressed as explicit validation policies. Radical proportionality for quantitative figures is one future example.
 
 ## Progressive Enhancement
 
@@ -62,7 +97,15 @@ TXT / Markdown
   -> experimental PDF
 ```
 
-Richer capabilities should build on stable lower layers rather than bypassing them.
+Richer capabilities should build on stable lower layers rather than bypassing them:
+
+```text
+project tree
+  -> project manifest and asset graph
+  -> diagnostics and validation
+  -> native preview or external adapter
+  -> render and reproducibility manifests
+```
 
 ## FLOSS-Oriented
 
