@@ -1,0 +1,111 @@
+{
+  "schema_version": "0.1",
+  "id": "figure-01-embudo",
+  "kind": "visualization",
+  "title": "Embudo de la impunidad",
+  "description": "Funnel-style proportional visualization of estimated crimes, reports, opened investigations, and positive outcomes.",
+  "status": "preliminary",
+  "language": "es",
+  "bundle": {
+    "root": "manuscript/master-report/figures",
+    "convention": "basename"
+  },
+  "source_data": [
+    {
+      "path": "manuscript/master-report/data/figure-01-embudo.csv",
+      "role": "data",
+      "media_type": "text/csv",
+      "required": true
+    },
+    {
+      "path": "manuscript/master-report/data/figure-01-embudo.json",
+      "role": "metadata",
+      "media_type": "application/json",
+      "required": true
+    }
+  ],
+  "source_code": [],
+  "specifications": [
+    {
+      "path": "manuscript/master-report/figure-specs-v1.md",
+      "role": "methodology",
+      "media_type": "text/markdown",
+      "required": true
+    }
+  ],
+  "notes": [
+    {
+      "path": "manuscript/master-report/figures/figure-01-embudo-notes.md",
+      "role": "notes",
+      "media_type": "text/markdown",
+      "required": false
+    }
+  ],
+  "rendered_assets": {
+    "svg": {
+      "path": "manuscript/master-report/figures/figure-01-embudo.svg",
+      "media_type": "image/svg+xml",
+      "width_px": 1200,
+      "height_px": 780
+    },
+    "png": null,
+    "html": null,
+    "pdf": null
+  },
+  "accessibility": {
+    "alt_text": "Embudo proporcional: de 33.5 millones de delitos estimados, 9.6% se denuncian, 6.768% abren carpeta y 0.8% tienen resultado positivo para la persona denunciante.",
+    "long_description": "La figura muestra barras horizontales proporcionales al total estimado. La barra final mide 8 pixeles sobre una base de 1000 pixeles para conservar la proporción real de 0.8%.",
+    "data_table": "manuscript/master-report/data/figure-01-embudo.csv",
+    "title_element_required": true,
+    "desc_element_required": true
+  },
+  "editorial": {
+    "caption": "Embudo de la impunidad. Los anchos son proporcionales al total estimado y no aplican mínimos visuales.",
+    "source_note": "Cifras del corpus local: FC-001 a FC-005. Requiere fact-check final.",
+    "methodology": "Anchos calculados sobre base de 1000 px: 1000, 96, 67.68 y 8 px.",
+    "fact_check_keys": ["FC-001", "FC-002", "FC-003", "FC-004", "FC-005"]
+  },
+  "layout": {
+    "default_placement": "full-width",
+    "aspect_ratio": "1200:780",
+    "min_readable_width_px": 900,
+    "keep_with_caption": true,
+    "page_break_before": "auto",
+    "page_break_after": "avoid"
+  },
+  "preferred_output": {
+    "html": "svg",
+    "pdf": "svg",
+    "docx": "png",
+    "epub": "svg"
+  },
+  "generation": {
+    "mode": "manual",
+    "command": null,
+    "working_directory": null,
+    "expected_outputs": [
+      "manuscript/master-report/figures/figure-01-embudo.svg"
+    ],
+    "deterministic": true,
+    "requires_network": false
+  },
+  "provenance": {
+    "created_at": null,
+    "updated_at": null,
+    "generated_at": null,
+    "generator": {
+      "name": "manual-svg",
+      "version": null,
+      "runtime": null,
+      "runtime_version": null
+    },
+    "source_checksums": {},
+    "output_checksums": {},
+    "command_digest": null
+  },
+  "validation": {
+    "status": "unknown",
+    "checked_at": null,
+    "diagnostics": []
+  }
+}
