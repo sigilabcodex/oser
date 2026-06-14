@@ -6,14 +6,15 @@ async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
 
   if (!args.rootPath) {
-    console.error("Usage: npm run scan:project -- <project-root> [--output path/to/project-manifest.json] [--ignore pattern]");
+    console.error("Usage: npm run scan:project -- <project-root> [--output path/to/project-manifest.json] [--config path/to/oser.project.json] [--ignore pattern]");
     process.exitCode = 1;
     return;
   }
 
   const manifest = await scanProject({
     rootPath: args.rootPath,
-    ignorePatterns: args.ignorePatterns
+    ignorePatterns: args.ignorePatterns,
+    configPath: args.configPath
   });
   const output = `${JSON.stringify(manifest, null, 2)}\n`;
 
@@ -30,6 +31,7 @@ async function main(): Promise<void> {
 type CliArgs = {
   rootPath?: string;
   outputPath?: string;
+  configPath?: string;
   ignorePatterns: string[];
 };
 
@@ -37,12 +39,19 @@ function parseArgs(args: string[]): CliArgs {
   const positional: string[] = [];
   const ignorePatterns: string[] = [];
   let outputPath: string | undefined;
+  let configPath: string | undefined;
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
 
     if (arg === "--output") {
       outputPath = readOptionValue(args, index, "--output");
+      index += 1;
+      continue;
+    }
+
+    if (arg === "--config") {
+      configPath = readOptionValue(args, index, "--config");
       index += 1;
       continue;
     }
@@ -59,6 +68,7 @@ function parseArgs(args: string[]): CliArgs {
   return {
     rootPath: positional[0],
     outputPath,
+    configPath,
     ignorePatterns
   };
 }

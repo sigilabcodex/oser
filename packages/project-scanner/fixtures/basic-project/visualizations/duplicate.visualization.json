@@ -1,0 +1,12 @@
+{
+  "schema_version": "0.1",
+  "id": "figure-02",
+  "kind": "visualization",
+  "title": "Duplicate ID Fixture",
+  "rendered_assets": {
+    "svg": { "path": "figures/figure-02.svg" }
+  },
+  "accessibility": {
+    "alt_text": "Duplicate ID."
+  }
+}

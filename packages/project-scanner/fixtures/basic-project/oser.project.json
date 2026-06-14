@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "0.1",
+  "id": "scanner-fixture",
+  "title": "Scanner Fixture Project",
+  "languages": ["en"],
+  "contentRoots": ["."],
+  "assetRoots": ["figures", "assets", "data", "notes"],
+  "ignore": ["ignored-output"],
+  "visualizationManifests": [
+    "visualizations/figure-02.visualization.json",
+    "visualizations/missing.visualization.json"
+  ],
+  "bibliography": [],
+  "outputRoots": ["ignored-output"]
+}

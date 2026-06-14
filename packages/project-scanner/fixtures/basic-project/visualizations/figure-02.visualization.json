@@ -1,0 +1,63 @@
+{
+  "schema_version": "0.1",
+  "id": "figure-02",
+  "kind": "visualization",
+  "title": "Declared Cross Directory Figure",
+  "status": "draft",
+  "source_data": [
+    {
+      "path": "data/figure-02.csv",
+      "role": "data",
+      "required": true
+    },
+    {
+      "path": "data/figure-02.json",
+      "role": "metadata",
+      "required": true
+    }
+  ],
+  "source_code": [
+    {
+      "path": "scripts/figure-02.py",
+      "role": "code",
+      "required": false
+    }
+  ],
+  "specifications": [
+    {
+      "path": "specs/figure-02.vega-lite.json",
+      "role": "spec",
+      "required": false
+    }
+  ],
+  "notes": [
+    {
+      "path": "notes/figure-02.md",
+      "role": "notes",
+      "required": false
+    },
+    {
+      "path": "../outside-note.md",
+      "role": "notes",
+      "required": false
+    }
+  ],
+  "rendered_assets": {
+    "svg": {
+      "path": "figures/figure-02.svg",
+      "media_type": "image/svg+xml"
+    },
+    "png": {
+      "path": "figures/figure-02-missing.png",
+      "media_type": "image/png"
+    }
+  },
+  "accessibility": {
+    "alt_text": "Declared figure fixture.",
+    "long_description": "A declared visualization with cross-directory dependencies.",
+    "data_table": "data/figure-02.csv"
+  },
+  "editorial": {
+    "caption": "Declared figure caption."
+  }
+}

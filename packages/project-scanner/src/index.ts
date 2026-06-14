@@ -1,20 +1,26 @@
 import { createHash } from "node:crypto";
-import { readdir, readFile, stat } from "node:fs/promises";
+import { access, readdir, readFile, stat } from "node:fs/promises";
 import { dirname, extname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import type {
   CandidateSidecarFile,
   CandidateSidecarGroup,
   CandidateSidecarRole,
   CandidateSidecarRoles,
+  OserProjectConfig,
+  OserProjectConfigSummary,
   OserProjectManifest,
   ProjectAssetRelationship,
   ProjectDiagnostic,
+  ProjectFileDeclaration,
   ProjectFileEntry,
   ProjectFileKind,
-  ProjectFileReference
+  ProjectFileReference,
+  VisualizationDeclaredRole,
+  VisualizationManifestSummary
 } from "../../project-model/src";
 
 const SCANNER_VERSION = "0.1.0";
+const DEFAULT_PROJECT_CONFIG_PATH = "oser.project.json";
 
 export const defaultProjectIgnorePatterns = [
   ".git",
@@ -30,6 +36,7 @@ export const defaultProjectIgnorePatterns = [
 export type ScanProjectOptions = {
   rootPath: string;
   ignorePatterns?: string[];
+  configPath?: string;
 };
 
 type FileRecord = {
@@ -42,11 +49,28 @@ type JsonClassification = {
   malformed: boolean;
 };
 
+type LoadedProjectConfig = {
+  path: string;
+  summary?: OserProjectConfigSummary;
+  config?: OserProjectConfig;
+  ignorePatterns: string[];
+};
+
+type VisualizationManifest = {
+  path: string;
+  summary: VisualizationManifestSummary;
+};
+
 export async function scanProject(options: ScanProjectOptions): Promise<OserProjectManifest> {
   const startedAt = new Date();
   const rootPath = resolve(options.rootPath);
-  const ignorePatterns = [...defaultProjectIgnorePatterns, ...(options.ignorePatterns ?? [])];
   const diagnostics: ProjectDiagnostic[] = [];
+  const loadedConfig = await loadProjectConfig(rootPath, options.configPath, diagnostics);
+  const ignorePatterns = [
+    ...defaultProjectIgnorePatterns,
+    ...loadedConfig.ignorePatterns,
+    ...(options.ignorePatterns ?? [])
+  ];
   const records = await walkProject(rootPath, ignorePatterns, diagnostics);
   const normalizedPathCounts = new Map<string, number>();
 
@@ -100,7 +124,9 @@ export async function scanProject(options: ScanProjectOptions): Promise<OserProj
         kind: "markdown-image",
         sourcePath: file.path,
         targetPath: reference.normalizedTarget,
+        provenance: "observed",
         observed: true,
+        declared: false,
         inferred: false,
         metadata: {
           alt: reference.alt ?? "",
@@ -114,6 +140,9 @@ export async function scanProject(options: ScanProjectOptions): Promise<OserProj
     file.references.sort((a, b) => a.target.localeCompare(b.target));
     file.referencedBy.sort((a, b) => a.sourcePath.localeCompare(b.sourcePath));
   }
+
+  const visualizationManifests = await discoverVisualizationManifests(rootPath, files, loadedConfig.summary, diagnostics);
+  applyVisualizationDeclarations(rootPath, files, relationships, visualizationManifests, diagnostics);
 
   const candidateSidecarGroups = inferCandidateSidecarGroups(files, relationships, diagnostics);
   relationships.sort(compareRelationships);
@@ -130,9 +159,11 @@ export async function scanProject(options: ScanProjectOptions): Promise<OserProj
       startedAt: startedAt.toISOString(),
       completedAt: new Date().toISOString(),
       note: "modifiedAt and scan timestamps are audit metadata, not reproducibility identity. Use checksums for content identity.",
-      ignorePatterns: options.ignorePatterns ?? [],
-      defaultIgnorePatterns: defaultProjectIgnorePatterns
+      ignorePatterns: [...loadedConfig.ignorePatterns, ...(options.ignorePatterns ?? [])],
+      defaultIgnorePatterns: defaultProjectIgnorePatterns,
+      configPath: loadedConfig.summary?.path
     },
+    project: loadedConfig.summary,
     files,
     relationships,
     candidateSidecarGroups,
@@ -223,6 +254,147 @@ function globLikeMatch(value: string, pattern: string): boolean {
   return new RegExp(`^${escaped}$`).test(value);
 }
 
+async function loadProjectConfig(
+  rootPath: string,
+  explicitConfigPath: string | undefined,
+  diagnostics: ProjectDiagnostic[]
+): Promise<LoadedProjectConfig> {
+  const configAbsolutePath = explicitConfigPath
+    ? resolve(rootPath, explicitConfigPath)
+    : resolve(rootPath, DEFAULT_PROJECT_CONFIG_PATH);
+
+  if (!isInsideRoot(rootPath, configAbsolutePath)) {
+    diagnostics.push({
+      code: "project-config-outside-root",
+      severity: "error",
+      message: "Project configuration path resolves outside the project root.",
+      target: explicitConfigPath ?? DEFAULT_PROJECT_CONFIG_PATH
+    });
+    return { path: explicitConfigPath ?? DEFAULT_PROJECT_CONFIG_PATH, ignorePatterns: [] };
+  }
+
+  try {
+    await access(configAbsolutePath);
+  } catch {
+    if (explicitConfigPath) {
+      diagnostics.push({
+        code: "missing-project-config",
+        severity: "error",
+        message: `Explicit project configuration file does not exist: ${explicitConfigPath}.`,
+        target: explicitConfigPath
+      });
+    }
+    return { path: normalizeRelativePath(rootPath, configAbsolutePath), ignorePatterns: [] };
+  }
+
+  const relativeConfigPath = normalizeRelativePath(rootPath, configAbsolutePath);
+  let parsed: unknown;
+
+  try {
+    parsed = JSON.parse(await readFile(configAbsolutePath, "utf8")) as unknown;
+  } catch (error) {
+    diagnostics.push({
+      code: "malformed-project-config",
+      severity: "error",
+      message: `Project configuration could not be parsed: ${relativeConfigPath}.`,
+      path: relativeConfigPath,
+      details: {
+        error: error instanceof Error ? error.message : String(error)
+      }
+    });
+    return { path: relativeConfigPath, ignorePatterns: [] };
+  }
+
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    diagnostics.push({
+      code: "unsupported-project-config",
+      severity: "error",
+      message: `Project configuration must be a JSON object: ${relativeConfigPath}.`,
+      path: relativeConfigPath
+    });
+    return { path: relativeConfigPath, ignorePatterns: [] };
+  }
+
+  const config = parsed as Record<string, unknown>;
+  const schemaVersion = typeof config.schemaVersion === "string" ? config.schemaVersion : undefined;
+  if (!schemaVersion) {
+    diagnostics.push({
+      code: "unsupported-project-config",
+      severity: "warning",
+      message: "Project configuration is missing schemaVersion.",
+      path: relativeConfigPath
+    });
+  } else if (schemaVersion !== "0.1") {
+    diagnostics.push({
+      code: "unsupported-project-config",
+      severity: "warning",
+      message: `Project configuration schemaVersion ${schemaVersion} is not explicitly supported by this scanner.`,
+      path: relativeConfigPath
+    });
+  }
+
+  const typedConfig: OserProjectConfig = {
+    schemaVersion: schemaVersion ?? "unknown",
+    id: stringValue(config.id),
+    title: stringValue(config.title),
+    languages: stringArray(config.languages, "languages", relativeConfigPath, diagnostics),
+    contentRoots: stringArray(config.contentRoots, "contentRoots", relativeConfigPath, diagnostics),
+    assetRoots: stringArray(config.assetRoots, "assetRoots", relativeConfigPath, diagnostics),
+    ignore: stringArray(config.ignore, "ignore", relativeConfigPath, diagnostics),
+    visualizationManifests: stringArray(config.visualizationManifests, "visualizationManifests", relativeConfigPath, diagnostics),
+    bibliography: stringArray(config.bibliography, "bibliography", relativeConfigPath, diagnostics),
+    outputRoots: stringArray(config.outputRoots, "outputRoots", relativeConfigPath, diagnostics)
+  };
+
+  const summary: OserProjectConfigSummary = {
+    path: relativeConfigPath,
+    id: typedConfig.id,
+    title: typedConfig.title,
+    languages: typedConfig.languages ?? [],
+    contentRoots: typedConfig.contentRoots ?? [],
+    assetRoots: typedConfig.assetRoots ?? [],
+    ignore: typedConfig.ignore ?? [],
+    visualizationManifests: typedConfig.visualizationManifests ?? [],
+    bibliography: typedConfig.bibliography ?? [],
+    outputRoots: typedConfig.outputRoots ?? []
+  };
+
+  return {
+    path: relativeConfigPath,
+    summary,
+    config: typedConfig,
+    ignorePatterns: typedConfig.ignore ?? []
+  };
+}
+
+function stringValue(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
+function stringArray(
+  value: unknown,
+  fieldName: string,
+  configPath: string,
+  diagnostics: ProjectDiagnostic[]
+): string[] | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
+    diagnostics.push({
+      code: "unsupported-project-config",
+      severity: "warning",
+      message: `Project configuration field ${fieldName} must be an array of strings.`,
+      path: configPath,
+      details: { fieldName }
+    });
+    return undefined;
+  }
+
+  return value;
+}
+
 async function inspectFile(
   rootPath: string,
   record: FileRecord,
@@ -253,7 +425,8 @@ async function inspectFile(
     },
     modifiedAt: fileStat.mtime.toISOString(),
     references: [],
-    referencedBy: []
+    referencedBy: [],
+    declarations: []
   };
 }
 
@@ -498,6 +671,341 @@ function safeDecodeUri(value: string): string {
   }
 }
 
+
+async function discoverVisualizationManifests(
+  rootPath: string,
+  files: ProjectFileEntry[],
+  config: OserProjectConfigSummary | undefined,
+  diagnostics: ProjectDiagnostic[]
+): Promise<VisualizationManifest[]> {
+  const manifestPaths = new Set<string>();
+
+  for (const declaredPath of config?.visualizationManifests ?? []) {
+    const normalized = resolveDeclaredProjectPath(rootPath, declaredPath, config ? config.path : "oser.project.json", diagnostics, "declared-path-outside-project-root");
+    if (normalized) {
+      manifestPaths.add(normalized);
+    }
+  }
+
+  for (const file of files) {
+    if (file.path.toLowerCase().endsWith(".visualization.json")) {
+      manifestPaths.add(file.path);
+    }
+  }
+
+  const manifests: VisualizationManifest[] = [];
+  const seenIds = new Map<string, string>();
+
+  for (const manifestPath of [...manifestPaths].sort()) {
+    const file = files.find((candidate) => candidate.path === manifestPath);
+    if (!file) {
+      diagnostics.push({
+        code: "missing-declared-file",
+        severity: "error",
+        message: `Declared visualization manifest does not exist: ${manifestPath}.`,
+        path: config ? config.path : undefined,
+        target: manifestPath
+      });
+      continue;
+    }
+
+    const manifest = await readVisualizationManifest(rootPath, manifestPath, diagnostics);
+    if (!manifest) {
+      continue;
+    }
+
+    const previousPath = seenIds.get(manifest.summary.id);
+    if (previousPath) {
+      diagnostics.push({
+        code: "duplicate-declared-asset-id",
+        severity: "error",
+        message: `Duplicate declared visualization asset id: ${manifest.summary.id}.`,
+        path: manifestPath,
+        target: previousPath
+      });
+    } else {
+      seenIds.set(manifest.summary.id, manifestPath);
+    }
+
+    manifests.push(manifest);
+  }
+
+  return manifests;
+}
+
+async function readVisualizationManifest(
+  rootPath: string,
+  manifestPath: string,
+  diagnostics: ProjectDiagnostic[]
+): Promise<VisualizationManifest | undefined> {
+  const absolutePath = resolve(rootPath, fromPosixPath(manifestPath));
+  let parsed: unknown;
+
+  try {
+    parsed = JSON.parse(await readFile(absolutePath, "utf8")) as unknown;
+  } catch (error) {
+    diagnostics.push({
+      code: "malformed-visualization-manifest",
+      severity: "error",
+      message: `Visualization manifest could not be parsed: ${manifestPath}.`,
+      path: manifestPath,
+      details: {
+        error: error instanceof Error ? error.message : String(error)
+      }
+    });
+    return undefined;
+  }
+
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    diagnostics.push({
+      code: "malformed-visualization-manifest",
+      severity: "error",
+      message: `Visualization manifest must be a JSON object: ${manifestPath}.`,
+      path: manifestPath
+    });
+    return undefined;
+  }
+
+  const record = parsed as Record<string, unknown>;
+  const id = stringValue(record.id);
+  if (!id) {
+    diagnostics.push({
+      code: "malformed-visualization-manifest",
+      severity: "error",
+      message: `Visualization manifest is missing a string id: ${manifestPath}.`,
+      path: manifestPath
+    });
+    return undefined;
+  }
+
+  const summary: VisualizationManifestSummary = {
+    path: manifestPath,
+    id,
+    title: stringValue(record.title),
+    status: stringValue(record.status),
+    sourceData: extractSourceRefs(record.source_data),
+    sourceCode: extractSourceRefs(record.source_code),
+    specifications: extractSourceRefs(record.specifications),
+    renderedAssets: extractRenderedRefs(record.rendered_assets),
+    notes: extractSourceRefs(record.notes),
+    metadata: extractSourceRefs(record.source_data).filter((path) => /\.json$/i.test(path)),
+    accessibility: extractAccessibility(record.accessibility),
+    caption: extractCaption(record.editorial)
+  };
+
+  if (summary.accessibility.dataTable) {
+    summary.sourceData.push(summary.accessibility.dataTable);
+  }
+
+  return { path: manifestPath, summary };
+}
+
+function extractSourceRefs(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((item) => {
+    if (typeof item === "string") {
+      return [item];
+    }
+
+    if (item && typeof item === "object" && typeof (item as Record<string, unknown>).path === "string") {
+      return [(item as Record<string, string>).path];
+    }
+
+    return [];
+  });
+}
+
+function extractRenderedRefs(value: unknown): string[] {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return [];
+  }
+
+  const paths: string[] = [];
+  for (const rendered of Object.values(value as Record<string, unknown>)) {
+    if (!rendered) {
+      continue;
+    }
+
+    if (typeof rendered === "string") {
+      paths.push(rendered);
+      continue;
+    }
+
+    if (typeof rendered === "object" && typeof (rendered as Record<string, unknown>).path === "string") {
+      paths.push((rendered as Record<string, string>).path);
+    }
+  }
+
+  return paths;
+}
+
+function extractAccessibility(value: unknown): VisualizationManifestSummary["accessibility"] {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {};
+  }
+
+  const record = value as Record<string, unknown>;
+  return {
+    altText: stringValue(record.alt_text) ?? stringValue(record.altText),
+    longDescription: stringValue(record.long_description) ?? stringValue(record.longDescription),
+    dataTable: stringValue(record.data_table) ?? stringValue(record.dataTable)
+  };
+}
+
+function extractCaption(value: unknown): string | undefined {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return undefined;
+  }
+
+  return stringValue((value as Record<string, unknown>).caption);
+}
+
+function applyVisualizationDeclarations(
+  rootPath: string,
+  files: ProjectFileEntry[],
+  relationships: ProjectAssetRelationship[],
+  manifests: VisualizationManifest[],
+  diagnostics: ProjectDiagnostic[]
+): void {
+  const fileMap = new Map(files.map((file) => [file.path, file]));
+
+  for (const manifest of manifests) {
+    const manifestFile = fileMap.get(manifest.path);
+    const declaredFiles: Array<{ path: string; role: VisualizationDeclaredRole }> = [
+      ...manifest.summary.sourceData.map((path) => ({ path, role: "source-data" as const })),
+      ...manifest.summary.sourceCode.map((path) => ({ path, role: "source-code" as const })),
+      ...manifest.summary.specifications.map((path) => ({ path, role: "specification" as const })),
+      ...manifest.summary.renderedAssets.map((path) => ({ path, role: "rendered-asset" as const })),
+      ...manifest.summary.notes.map((path) => ({ path, role: "notes" as const })),
+      ...manifest.summary.metadata.map((path) => ({ path, role: "metadata" as const }))
+    ];
+
+    if (manifest.summary.accessibility.dataTable) {
+      declaredFiles.push({ path: manifest.summary.accessibility.dataTable, role: "accessibility" });
+    }
+
+    for (const declaredFile of uniqueDeclaredFiles(declaredFiles)) {
+      const normalizedDeclaredPath = resolveDeclaredProjectPath(
+        rootPath,
+        declaredFile.path,
+        manifest.path,
+        diagnostics,
+        "declared-path-outside-project-root"
+      );
+      if (!normalizedDeclaredPath) {
+        continue;
+      }
+
+      const target = fileMap.get(normalizedDeclaredPath);
+      if (!target) {
+        diagnostics.push({
+          code: declaredFile.role === "rendered-asset" ? "declared-rendered-asset-missing" : "missing-declared-file",
+          severity: "error",
+          message: `Declared ${declaredFile.role} does not exist: ${normalizedDeclaredPath}.`,
+          path: manifest.path,
+          target: normalizedDeclaredPath,
+          details: {
+            assetId: manifest.summary.id,
+            role: declaredFile.role
+          }
+        });
+        continue;
+      }
+
+      const declaration: ProjectFileDeclaration = {
+        sourcePath: manifest.path,
+        kind: "visualization-declaration",
+        role: declaredFile.role,
+        assetId: manifest.summary.id
+      };
+      target.declarations.push(declaration);
+      addBackReference(target, manifest.path, "visualization-declaration");
+
+      relationships.push({
+        kind: "visualization-declaration",
+        sourcePath: manifest.path,
+        targetPath: normalizedDeclaredPath,
+        provenance: "declared",
+        observed: false,
+        declared: true,
+        inferred: false,
+        metadata: {
+          assetId: manifest.summary.id,
+          role: declaredFile.role
+        }
+      });
+    }
+
+    if (manifest.summary.caption && manifestFile) {
+      manifestFile.declarations.push({
+        sourcePath: manifest.path,
+        kind: "visualization-declaration",
+        role: "caption",
+        assetId: manifest.summary.id
+      });
+    }
+  }
+}
+
+
+function addBackReference(
+  file: ProjectFileEntry,
+  sourcePath: string,
+  kind: "markdown-image" | "visualization-declaration"
+): void {
+  if (file.referencedBy.some((reference) => reference.sourcePath === sourcePath && reference.kind === kind)) {
+    return;
+  }
+
+  file.referencedBy.push({ sourcePath, kind });
+}
+
+function uniqueDeclaredFiles(
+  files: Array<{ path: string; role: VisualizationDeclaredRole }>
+): Array<{ path: string; role: VisualizationDeclaredRole }> {
+  const seen = new Set<string>();
+  const unique: Array<{ path: string; role: VisualizationDeclaredRole }> = [];
+
+  for (const file of files) {
+    const key = `${file.role}:${file.path}`;
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    unique.push(file);
+  }
+
+  return unique;
+}
+
+function resolveDeclaredProjectPath(
+  rootPath: string,
+  declaredPath: string,
+  sourcePath: string,
+  diagnostics: ProjectDiagnostic[],
+  diagnosticCode: string
+): string | undefined {
+  const absolutePath = isAbsolute(declaredPath)
+    ? resolve(declaredPath)
+    : resolve(rootPath, fromPosixPath(declaredPath));
+
+  if (!isInsideRoot(rootPath, absolutePath)) {
+    diagnostics.push({
+      code: diagnosticCode,
+      severity: "error",
+      message: `Declared path resolves outside the project root: ${declaredPath}.`,
+      path: sourcePath,
+      target: declaredPath
+    });
+    return undefined;
+  }
+
+  return normalizeRelativePath(rootPath, absolutePath);
+}
+
 function inferCandidateSidecarGroups(
   files: ProjectFileEntry[],
   relationships: ProjectAssetRelationship[],
@@ -550,7 +1058,7 @@ function inferCandidateSidecarGroups(
       id: groupId,
       basename,
       directory,
-      inferred: true,
+      provenance: "inferred",
       files: groupFiles,
       roles,
       diagnostics: groupDiagnostics
@@ -562,7 +1070,9 @@ function inferCandidateSidecarGroups(
         kind: "candidate-sidecar",
         sourcePath: groupId,
         targetPath: file.path,
+        provenance: "inferred",
         observed: false,
+        declared: false,
         inferred: true,
         metadata: {
           role: file.role

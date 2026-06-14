@@ -1,6 +1,7 @@
 export type OserProjectManifest = {
   schemaVersion: "0.1";
   scan: ProjectScanMetadata;
+  project?: OserProjectConfigSummary;
   files: ProjectFileEntry[];
   relationships: ProjectAssetRelationship[];
   candidateSidecarGroups: CandidateSidecarGroup[];
@@ -18,6 +19,33 @@ export type ProjectScanMetadata = {
   note: string;
   ignorePatterns: string[];
   defaultIgnorePatterns: string[];
+  configPath?: string;
+};
+
+export type OserProjectConfig = {
+  schemaVersion: string;
+  id?: string;
+  title?: string;
+  languages?: string[];
+  contentRoots?: string[];
+  assetRoots?: string[];
+  ignore?: string[];
+  visualizationManifests?: string[];
+  bibliography?: string[];
+  outputRoots?: string[];
+};
+
+export type OserProjectConfigSummary = {
+  path: string;
+  id?: string;
+  title?: string;
+  languages: string[];
+  contentRoots: string[];
+  assetRoots: string[];
+  ignore: string[];
+  visualizationManifests: string[];
+  bibliography: string[];
+  outputRoots: string[];
 };
 
 export type ProjectFileKind =
@@ -48,6 +76,7 @@ export type ProjectFileEntry = {
   modifiedAt: string;
   references: ProjectFileReference[];
   referencedBy: ProjectFileBackReference[];
+  declarations: ProjectFileDeclaration[];
 };
 
 export type ProjectFileReference = {
@@ -61,23 +90,44 @@ export type ProjectFileReference = {
 
 export type ProjectFileBackReference = {
   sourcePath: string;
-  kind: "markdown-image";
+  kind: "markdown-image" | "visualization-declaration";
 };
 
+export type ProjectFileDeclaration = {
+  sourcePath: string;
+  kind: "visualization-declaration";
+  role: VisualizationDeclaredRole;
+  assetId: string;
+};
+
+export type ProjectRelationshipProvenance = "observed" | "declared" | "inferred";
+
 export type ProjectAssetRelationship = {
-  kind: "markdown-image" | "candidate-sidecar";
+  kind: "markdown-image" | "candidate-sidecar" | "visualization-declaration";
   sourcePath: string;
   targetPath: string;
+  provenance: ProjectRelationshipProvenance;
   observed: boolean;
+  declared: boolean;
   inferred: boolean;
   metadata?: Record<string, string | number | boolean>;
 };
+
+export type VisualizationDeclaredRole =
+  | "source-data"
+  | "source-code"
+  | "specification"
+  | "rendered-asset"
+  | "notes"
+  | "metadata"
+  | "accessibility"
+  | "caption";
 
 export type CandidateSidecarGroup = {
   id: string;
   basename: string;
   directory: string;
-  inferred: true;
+  provenance: ProjectRelationshipProvenance;
   files: CandidateSidecarFile[];
   roles: CandidateSidecarRoles;
   diagnostics: string[];
@@ -114,6 +164,25 @@ export type CandidateSidecarRoles = {
 };
 
 export type ProjectDiagnosticSeverity = "info" | "warning" | "error";
+
+export type VisualizationManifestSummary = {
+  path: string;
+  id: string;
+  title?: string;
+  status?: string;
+  sourceData: string[];
+  sourceCode: string[];
+  specifications: string[];
+  renderedAssets: string[];
+  notes: string[];
+  metadata: string[];
+  accessibility: {
+    altText?: string;
+    longDescription?: string;
+    dataTable?: string;
+  };
+  caption?: string;
+};
 
 export type ProjectDiagnostic = {
   code: string;
